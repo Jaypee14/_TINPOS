@@ -27,5 +27,11 @@ namespace TINPOS_Project.Window_Forms
         {
 
         }
+
+        private void btn_Save_Click(object sender, EventArgs e)
+        {
+            //Call Function Add_Customer
+
+        }
     }
 }

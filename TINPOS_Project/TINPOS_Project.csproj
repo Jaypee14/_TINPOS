@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TINPOS_Project</RootNamespace>
     <AssemblyName>TINPOS_Project</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -34,6 +34,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,6 +50,17 @@
     <Compile Include="Class\c_Rights.cs" />
     <Compile Include="Class\c_Shared.cs" />
     <Compile Include="Class\c_TX_Database.cs" />
+    <Compile Include="Class\POSDatabase\A02.cs" />
+    <Compile Include="Class\POSDatabase\T01.cs" />
+    <Compile Include="Class\POSDatabase\S02.cs" />
+    <Compile Include="Class\POSDatabase\S03.cs" />
+    <Compile Include="Class\POSDatabase\S01.cs" />
+    <Compile Include="Window Forms\Admin\SM_SecurityMaintenance.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Window Forms\Admin\SM_SecurityMaintenance.Designer.cs">
+      <DependentUpon>SM_SecurityMaintenance.cs</DependentUpon>
+    </Compile>
     <Compile Include="Window Forms\CustomerRecord.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -63,6 +75,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Window Forms\Admin\SM_SecurityMaintenance.resx">
+      <DependentUpon>SM_SecurityMaintenance.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Window Forms\CustomerRecord.resx">
       <DependentUpon>CustomerRecord.cs</DependentUpon>
     </EmbeddedResource>
@@ -78,6 +93,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="Class\Common.dat" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -93,6 +109,15 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Objects\Images\w_Main\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataGridViewGrouper\DataGridViewGrouper.csproj">
+      <Project>{785a6fbb-2ba0-42be-84c4-1703bcad15d2}</Project>
+      <Name>DataGridViewGrouper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

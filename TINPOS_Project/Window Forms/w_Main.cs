@@ -9,17 +9,21 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TINPOS_Project.Class;
 using TINPOS_Project.Window_Forms;
+using TINPOS_Project.Class.POSDatabase;
+using TINPOS_Project.Window_Forms.Admin;
 
 namespace TINPOS_Project
 {
     public partial class w_Main : Form
     {
         //INITIALIZE CLASSES
-        c_Database txc_dat = new c_Database();
+      
+        c_Shared shr = new c_Shared();
+        
 
         //INITIALIZE FORMS
-        CustomerRecord frm_customerRecord = new CustomerRecord();
-
+       
+        
 
 
         public w_Main()
@@ -27,19 +31,29 @@ namespace TINPOS_Project
             InitializeComponent();
 
             //SET PARENT FORM
-            frm_customerRecord.MdiParent = this;
+            
+          
+      //      shr.Initialize_TX();
 
+     
+            String[] add_Product = {"add_A03_Product", "Add Products", "PR"};
+            shr.txFunction(add_Product);
+            
 
-
-            txc_dat.dbOpen();
-
-
-            txc_dat.dbClose();
         }
 
         private void ts_bt_Customers_Click(object sender, EventArgs e)
         {
+            CustomerRecord frm_customerRecord = new CustomerRecord();
+            frm_customerRecord.MdiParent = this;
             frm_customerRecord.Show();
+        }
+
+        private void securityMaintenanceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SM_SecurityMaintenance frm_SM = new SM_SecurityMaintenance();
+            frm_SM.MdiParent = this;
+            frm_SM.Show();
         }
 
        

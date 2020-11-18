@@ -1,0 +1,44 @@
+﻿ ********************FORMAT*******************
+ * (TXNAME),_columncount                     *
+ * colname1, *must match the database table  *
+ * lastcol;  *must have ';'                  *
+ *********************************************
+
+ (TXA02),_7
+A02_ID,
+A02_GUID,
+A02_USERID,
+A02_FIRSTNAME,
+A02_LASTNAME,
+A02_PASSWORD,
+A02_CREATEDBY;
+
+
+(TXS01),_5
+S01_ID,
+S01_GUID,
+S01_Transaction,
+S01_Description,
+S01_ScreenName;
+
+(TXS02),_4
+S02_ID,
+S02_GUID,
+S02_GROUP_NAME,
+S02_DESCRIPTION;
+
+
+(TXS03),_6
+S03_ID,
+S03_GUID,
+S03_A02_ID,
+S03_S02_ID,
+S03_S01_ID,
+S03_ACCESS;
+
+(TXT01),_5
+T01_ID,
+T01_GUID,
+T01_S02_ID,
+T01_S01_ID,
+T01_ACCESS;
