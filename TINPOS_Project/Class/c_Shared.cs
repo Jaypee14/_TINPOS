@@ -177,7 +177,27 @@ namespace TINPOS_Project.Class
 
         }
 
-        //Test Again if no credentials needed
- 
+        public void CreateDir(string path, string fileName)
+        {
+            string TINPOS = @"C:\TINPOS";
+            string DebugSource = Directory.GetCurrentDirectory();
+            string directory = Path.GetDirectoryName(DebugSource);
+            string oneUp = Path.GetDirectoryName(directory);
+            string CommonSource = oneUp + "\\" + "Class" + "\\" + fileName;
+
+            if (!Directory.Exists(TINPOS))
+                Directory.CreateDirectory(TINPOS);
+
+            //if exist
+            if (!Directory.Exists(TINPOS + "\\" + path))
+                Directory.CreateDirectory(TINPOS + "\\" + path);
+
+            string targetPath = TINPOS + "\\" + path + "\\" + fileName;
+
+            if (!File.Exists(TINPOS + "\\" + path + "\\" + fileName))
+                File.Copy(CommonSource, targetPath);
+
+        }
+
     }
 }
