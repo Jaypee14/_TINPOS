@@ -10,6 +10,7 @@ using System.IO;
 using TINPOS_Project.Class.POSDatabase;
 using System.Data;
 
+
 namespace TINPOS_Project.Class
 {
   
@@ -32,12 +33,7 @@ namespace TINPOS_Project.Class
         public string txdat_File = @"C:\TINPOS\DAT\Common.dat";
 
 
-    
-
-
-    
-
-
+  
 
         public string errMsg;
         public void ErrorMessage(String errorCode, String errorMessage)
@@ -124,7 +120,7 @@ namespace TINPOS_Project.Class
         return txTable;
 
         ErrorMessage:
-        ErrorMessage("TX_Get", "TxFile does not exist");
+        ErrorMessage("TX_Get", "TxFile does not exist: " + txName);
         return null;
 
         }
@@ -173,9 +169,40 @@ namespace TINPOS_Project.Class
             //Check if user has access.
          //   MessageBox.Show(S01.ID.ToString());
 
+           
+
             return;
 
         }
+
+
+        public string toTitleCase(string text)
+        {
+            if (text == string.Empty)
+                return string.Empty;
+            int count = text.Length;
+            string TitleCase = text.Substring(0, 1).ToUpper();
+            for (int i = 1; i < count; i++)
+            {
+                if (text.Substring(i, 1) == " ") 
+                {
+                    TitleCase = TitleCase + text.Substring(i, 1);
+                    TitleCase = TitleCase + text.Substring(i + 1, 1).ToUpper();
+                    i++;
+                }
+                else
+                    TitleCase = TitleCase + text.Substring(i, 1).ToLower();
+
+            }
+            return TitleCase;
+        }
+
+        /*Function to create screen name,
+         *Assign the screen name to a specific form
+         *Use the S00_Screen in GO TO window
+         *S00_Description will be the Name of the form e.g. CustomerRecord(.cs) --.cs excluded.
+         * 
+         */
 
         public void CreateDir(string path, string fileName)
         {

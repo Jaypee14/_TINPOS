@@ -15,6 +15,7 @@ namespace TINPOS_Project.Window_Forms
         public CustomerRecord()
         {
             InitializeComponent();
+            
 
         }
 

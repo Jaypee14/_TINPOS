@@ -13,13 +13,18 @@ A02_LASTNAME,
 A02_PASSWORD,
 A02_CREATEDBY;
 
+(TXS00),_4
+S01_ID,
+S01_GUID,
+S01_Screen,
+S01_Description;
 
 (TXS01),_5
 S01_ID,
 S01_GUID,
 S01_Transaction,
 S01_Description,
-S01_ScreenName;
+S01_S00_ID;
 
 (TXS02),_4
 S02_ID,

@@ -19,11 +19,7 @@ namespace TINPOS_Project.Class.POSDatabase
                       Password_C = 5,
                       CreatedBy_C = 6;
 
-       // public int ID;
-        // public Guid   A02_GUID;
-        //public string Transaction;
-        //public string Description;
-        //public string ScreenName;
+
 
 
         public void Initialization()
@@ -31,6 +27,17 @@ namespace TINPOS_Project.Class.POSDatabase
             c_Database db = new c_Database();
             c_Shared shr = new c_Shared();
             Columns_C = shr.TX_Get("TXA02");
+        }
+
+        public string[] getColumnName(int[] colIndex)
+        {
+            int colCount = colIndex.Count();
+            string[] columns = new string[colCount];
+            for (int ix = 0; ix < colCount; ix++)
+            {
+                columns[ix] = Columns_C[colIndex[ix]];
+            }
+            return columns;
         }
 
         public void AddValues(String[] Values)
@@ -59,13 +66,42 @@ namespace TINPOS_Project.Class.POSDatabase
         public DataTable get_By_UserID(String userID)
         {
             c_Database db = new c_Database();
-            db.dbOpen();
             Initialization();
             String query = "Select * from [" + TableName + "] " +
                             "Where " + Columns_C[UserID_C] + " = '" + userID + "'";
             DataTable szData = db.dbSqlDataAdapter(query);
             return szData;
 
+        }
+
+        /// <summary>
+        /// Get all by column Index. For Int data types only
+        /// </summary>
+        /// <param name="colIndex">Column Index. Column type must be Int.</param>
+        /// <param name="_ID">Value of ID to search</param>
+        /// <returns></returns>
+        public DataTable get_All_By(int[] colIndex, int[] values)
+        {
+            c_Shared shr = new c_Shared();
+            c_Database db = new c_Database();
+            Initialization();
+            //check if both have same length.
+            int colCount = colIndex.Count();
+            int idxCount = values.Count();
+
+            if (colCount != idxCount)
+            {
+                shr.errMsg = "Columns and Values do not match.";
+                goto Exit;
+            }
+
+            string[] columns = getColumnName(colIndex);
+            DataTable szData = db.Get_All_By(TableName, columns, values);
+            return szData;
+
+        Exit:
+            shr.ErrorMessage(TableName + "get_All_By() ", shr.errMsg);
+            return null;
         }
 
         
