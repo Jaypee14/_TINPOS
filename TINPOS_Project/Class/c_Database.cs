@@ -64,12 +64,38 @@ namespace TINPOS_Project.Class
 
         public DataTable dbSqlDataAdapter(String query)
         {
-            using (SqlDataAdapter reader = new SqlDataAdapter(query, sql_con))
+            try
             {
-                DataSet datatable = new DataSet();
-                reader.Fill(datatable);
-                dbClose();
-                return datatable.Tables[0];
+                dbOpen();
+                using (SqlDataAdapter reader = new SqlDataAdapter(query, sql_con))
+                {
+                    DataSet datatable = new DataSet();
+                    reader.Fill(datatable);
+                    dbClose();
+                    return datatable.Tables[0];
+                }
+            }
+            catch (Exception e)
+            {
+                shr.ErrorMessage("QueryError: ", query + " " + e.Message);
+                return null;
+            }
+        }
+
+        public void dbExecuteNonQuery(string query)
+        {
+            try
+            {
+                dbOpen();
+                using (SqlCommand command = sql_con.CreateCommand()){
+                    command.CommandText = query;
+                    command.ExecuteNonQuery();
+                    dbClose();
+                }
+            }
+            catch (Exception e)
+            {
+                shr.ErrorMessage("UpdateError: ", query + " " + e.Message);
             }
         }
 
@@ -78,15 +104,17 @@ namespace TINPOS_Project.Class
             Boolean hasGuid = false;
             String szColumnNames = "";
             String szValues = "";
-            int szColCount = ColumnName.GetLength(0);
-            int szRowCount = Values.GetLength(0);
+            int szColCount = ColumnName.Count();
+            int szRowCount = Values.Count();
+            string szTableID = TableName.Substring(0, 4) + "ID";
 
             int ix = 0;
             var szCheckColumns = from szColName in ColumnName
                               select szColName;
             foreach (var szColName in szCheckColumns)
             {
-                if (szColName.Contains("_ID"))
+
+                if (szColName == szTableID)
                     goto Next;
 
                 if (szColName.Contains("_GUID"))
@@ -113,7 +141,7 @@ namespace TINPOS_Project.Class
                     szValues = szValues + ", ";
                 ix++;
             }
-
+       
             dbOpen();
             using (SqlTransaction trans = sql_con.BeginTransaction())
             using (SqlCommand cmd = sql_con.CreateCommand())
@@ -150,59 +178,76 @@ namespace TINPOS_Project.Class
         
         }
 
-
-
-
-        /*      public string GET_ALL(String TableName) 
-              {
-                  S01_SCRN_TRANS S01 = new S01_SCRN_TRANS();
-                  SqlCommand cmd = new SqlCommand("Select * from [" + TableName + "]", sql_con);
-                  using (SqlDataReader reader = cmd.ExecuteReader())
-                  {
-                      while (reader.Read())
-                      {
-                          S01 = shr.MapToClass<S01_SCRN_TRANS>(reader);
-                          MessageBox.Show(S01.S01_GUID.ToString());
-                      }
-                      return "";
-                  }
-              }*/
         public DataTable Get_All(String TableName)
         {
-            dbOpen();
             String query = "Select * from [" + TableName + "]";
+            DataTable szData = dbSqlDataAdapter(query);
+            return szData;
+        }
 
+        public DataTable Get_All_By(string TableName, string[] columns, int[] values)
+        {
+           
+            //check if both have same length.
+            int colCount = columns.Count();
+            int valCount = values.Count();
+
+            if (colCount != valCount)
+            {
+                shr.errMsg = "Columns and Values do not match.";
+                goto Exit;
+            }
+
+            string q_condition = "";
+
+            for (int ix = 0; ix < colCount; ix++)
+            {
+                q_condition = q_condition + columns[ix] + " = " + values[ix];
+                if (ix < colCount - 1)
+                    q_condition = q_condition + " and ";
+            }
+
+            String query = "Select * from [" + TableName + "] " +
+                            "Where " + q_condition;
             DataTable szData = dbSqlDataAdapter(query);
             return szData;
 
-            //using (SqlDataAdapter reader = new SqlDataAdapter(query, sql_con)) ----------111520
-            //{
-            //    DataSet datatable = new DataSet();
-            //    reader.Fill(datatable);
-            //    dbClose();
-            //    return datatable.Tables[0];
-            //}
+        Exit:
+            shr.ErrorMessage(TableName + ": ", shr.errMsg);
+            return null;
+        }
+
+        public void Update_Table(string TableName, string[] Columns, string[] Values, string Condition)
+        {
+            //check if both have same length.
+            int colCount = Columns.Count();
+            int valCount = Values.Count();
+            if (colCount != valCount)
+            {
+                shr.errMsg = "Columns and Values do not match.";
+                goto Exit;
+            }
+
+            string q_set = "";
+
+            for (int ix = 0; ix < colCount; ix++)
+            {
+                q_set = q_set + Columns[ix] + " = " + Values[ix];
+                if (ix < colCount - 1)
+                    q_set = q_set + ", ";
+            }
+
+            String query = "Update [" + TableName + "] " +
+                            "Set " + q_set +
+                            " Where " + Condition;
+            dbExecuteNonQuery(query);
+            return;
+
+            Exit:
+            shr.ErrorMessage(TableName + ": ", shr.errMsg);
         }
           
-        public DataTable Get_ByID(String TableName, int ID)
-        {
-            dbOpen();
-            String query = "Select * from [" + TableName + "] " +
-                            "Where " + TableName.Substring(0,3) + "_ID = " + ID ;
 
-            DataTable szData = dbSqlDataAdapter(query);
-            return szData;
-
-
-            //using (SqlDataAdapter reader = new SqlDataAdapter(query, sql_con))  ------------111520
-            //{
-            //    DataSet datatable = new DataSet();
-            //    reader.Fill(datatable);
-            //    dbClose();
-            //    return datatable.Tables[0];
-            //}
-
-        }
 
     }
 }

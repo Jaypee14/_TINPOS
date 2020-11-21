@@ -51,6 +51,7 @@
     <Compile Include="Class\c_Shared.cs" />
     <Compile Include="Class\c_TX_Database.cs" />
     <Compile Include="Class\POSDatabase\A02.cs" />
+    <Compile Include="Class\POSDatabase\S00.cs" />
     <Compile Include="Class\POSDatabase\T01.cs" />
     <Compile Include="Class\POSDatabase\S02.cs" />
     <Compile Include="Class\POSDatabase\S03.cs" />
