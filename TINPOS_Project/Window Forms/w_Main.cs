@@ -31,11 +31,11 @@ namespace TINPOS_Project
             InitializeComponent();
 
             //SET PARENT FORM
-            
-          
-      //      shr.Initialize_TX();
 
-     
+
+            //      shr.Initialize_TX();
+
+            shr.CreateDir("DAT", "Common.dat");
             String[] add_Product = {"add_A03_Product", "Add Products", "PR"};
             shr.txFunction(add_Product);
             
