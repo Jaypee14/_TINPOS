@@ -28,11 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btn_Enquire = new System.Windows.Forms.Button();
             this.dgv_Main = new System.Windows.Forms.DataGridView();
             this.grb_Bottom = new System.Windows.Forms.GroupBox();
@@ -95,14 +96,14 @@
             this.dgv_Main.MultiSelect = false;
             this.dgv_Main.Name = "dgv_Main";
             this.dgv_Main.ReadOnly = true;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgv_Main.RowHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgv_Main.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this.dgv_Main.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.dgv_Main.Size = new System.Drawing.Size(757, 425);
             this.dgv_Main.TabIndex = 2;
@@ -143,7 +144,7 @@
             this.btn_AddMenuLevel.TabIndex = 4;
             this.btn_AddMenuLevel.Text = "Add Menu Level";
             this.btn_AddMenuLevel.UseVisualStyleBackColor = true;
-            this.btn_AddMenuLevel.Visible = false;
+            this.btn_AddMenuLevel.Click += new System.EventHandler(this.btn_AddMenuLevel_Click);
             // 
             // btn_Add
             // 
@@ -242,7 +243,6 @@
             this.cmb_ID.Name = "cmb_ID";
             this.cmb_ID.Size = new System.Drawing.Size(158, 21);
             this.cmb_ID.TabIndex = 0;
-            this.cmb_ID.Text = "MN1000";
             this.cmb_ID.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmb_ID_KeyDown);
             // 
             // lbl_ID
@@ -286,9 +286,9 @@
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(396, 366);
+            this.dataGridView1.Location = new System.Drawing.Point(69, 339);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(373, 150);
+            this.dataGridView1.Size = new System.Drawing.Size(700, 177);
             this.dataGridView1.TabIndex = 7;
             this.dataGridView1.Visible = false;
             // 
@@ -331,6 +331,10 @@
             // 
             // col_ParentAccess
             // 
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.LightGray;
+            dataGridViewCellStyle4.NullValue = System.Windows.Forms.CheckState.Indeterminate;
+            this.col_ParentAccess.DefaultCellStyle = dataGridViewCellStyle4;
             this.col_ParentAccess.HeaderText = " Parent Access";
             this.col_ParentAccess.IndeterminateValue = "-1";
             this.col_ParentAccess.Name = "col_ParentAccess";
@@ -353,8 +357,8 @@
             // 
             // col_Edited
             // 
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col_Edited.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.col_Edited.DefaultCellStyle = dataGridViewCellStyle5;
             this.col_Edited.HeaderText = "*";
             this.col_Edited.Name = "col_Edited";
             this.col_Edited.ReadOnly = true;
@@ -373,7 +377,6 @@
             this.Controls.Add(this.dataGridView1);
             this.Name = "SM_SecurityMaintenance";
             this.Text = "Security Maintenance";
-            this.Load += new System.EventHandler(this.SM_SecurityMaintenance_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgv_Main)).EndInit();
             this.grb_Bottom.ResumeLayout(false);
             this.grb_TopRight.ResumeLayout(false);

@@ -16,6 +16,7 @@ namespace TINPOS_Project.Window_Forms.Admin
 
     public partial class SM_SecurityMaintenance : Form
     {
+        #region Declarations
         //Classes
         A02 a02 = new A02();
         S00 s00 = new S00();
@@ -45,7 +46,12 @@ namespace TINPOS_Project.Window_Forms.Admin
           Action = 1
           Value = 2
          */
+        #endregion
 
+
+
+        #region Form Functions
+        
         public SM_SecurityMaintenance()
         {
             InitializeComponent();
@@ -58,12 +64,201 @@ namespace TINPOS_Project.Window_Forms.Admin
 
             LoadDefaults();
         }
+        private void btn_Enquire_Click(object sender, EventArgs e)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            LoadDefaults();
+            Enquire();
+            EnableButtons();
+            Cursor.Current = Cursors.Default;
+        }
 
-        private void SM_SecurityMaintenance_Load(object sender, EventArgs e)
+        private void dgv_Main_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            DataGridViewCellStyle style =
+               dgv_Main.ColumnHeadersDefaultCellStyle;
+            style.Font = new Font(dgv_Main.Font, FontStyle.Bold);
+            dgv_Main.RowHeadersVisible = false;
+            dgv_Main.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgv_Main.MultiSelect = false;
+        }
+
+        private void dgv_Main_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            dgv_SelectedRowIndex = dgv_Main.SelectedCells[0].RowIndex;
+        }
+
+        private void btn_Add_Click(object sender, EventArgs e)
+        {
+            dgvMain_Add_Subtract("Add");
+        }
+
+        private void btn_Subtract_Click(object sender, EventArgs e)
+        {
+            dgvMain_Add_Subtract("Subtract");
+        }
+
+        private void cmb_ID_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter)
+                return;
+            btn_Enquire_Click(sender, e);
+        }
+
+        private void btn_Back_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void btn_UpdateLink_Click(object sender, EventArgs e)
         {
 
-         
+            c_Shared shr = new c_Shared();
+            if (cmb_Parent.Text == string.Empty)
+                return;
+            if (cmb_Child.Text == string.Empty)
+                return;
+
+            string szUsrID = cmb_Child.Text.ToUpper();
+            string szMenuLevel = cmb_Parent.Text.ToUpper();
+            cmb_ID.Text = szUsrID;
+
+            //search if userID Exists in A02.
+            DataTable szA02Data = new DataTable();
+            szA02Data = a02.get_By_UserID(szUsrID);
+            if (szA02Data.Rows.Count == 0)
+            {
+                shr.errMsg = "User ID not Found";
+                goto Exit;
+            }
+            szA02_ID = Int32.Parse(szA02Data.Rows[0][a02.Columns_C[a02.ID_C]].ToString());
+
+            //search if menu level exists in S02.
+            DataTable szS02Data = new DataTable();
+            szS02Data = db.Get_All(s02.TableName);
+            var szResult = from myResult in szS02Data.AsEnumerable()
+                           where myResult.Field<string>(s02.Columns_C[s02.Group_Name_C].ToString()) == szMenuLevel
+                           select myResult;
+            foreach (var result in szResult)
+            {
+                szS02_ID = result.Field<int>(s02.Columns_C[s02.ID_C]);
+            }
+
+            //search if userID exist in S03.
+            int[] column = { s03.A02_ID_C
+                           };
+            string[] values = { szA02_ID.ToString()
+                              };
+            DataTable szS03Data = s03.get_All_By(column, values);
+            if (szS03Data.Rows.Count == 0)
+            {
+                //Insert values to S03
+                int[] s03Columns = { s03.A02_ID_C,
+                                     s03.S02_ID_C,
+                                   };
+                string[] s03Values ={szA02_ID.ToString(),
+                                     szS02_ID.ToString(),
+                                     /*""/*S03_S01_ID = null,*/
+                                     /*""S03_ACCESS = null*/};
+                s03.AddValues(s03Columns, s03Values);
+                goto FinalStep;
+            }
+            //Update Menu Level in S03
+            int szS03_ID = 0;
+            foreach (var s03data in szS03Data.AsEnumerable())
+            {
+                szS03_ID = s03data.Field<int>(s03.Columns_C[s03.ID_C]);
+            }
+
+            int[] s03Col = { s03.S02_ID_C };
+            string[] s03Val = { szS02_ID.ToString()};
+            s03.update_By_ID(s03Col, s03Val, szS03_ID);
+
+        FinalStep:
+            btn_Enquire_Click(sender, e);
+            return;
+        Exit:
+            shr.ErrorMessage("SM_Link()", shr.errMsg);
         }
+
+        private void btn_Update_Click(object sender, EventArgs e)
+        {
+            //
+            if (queryTable.Rows.Count == 0)
+                return;
+            dataGridView1.DataSource = queryTable;
+
+            int dgvCount = dataGridView1.Rows.Count;
+            int ix = 1;
+            foreach (DataGridViewRow dgvRow in dataGridView1.Rows)
+            {
+
+                string colAction = dgvRow.Cells[1].Value.ToString();
+                string colValues = dgvRow.Cells[2].Value.ToString();
+                string[] values = colValues.Split(',');
+
+                if (szMenuLevel)
+                {
+                    //Update T01
+                    int szT01_ID = Convert.ToInt32(values[0]);
+                    string szT01_Access = values[1].ToString();
+                    int[] t01Col = { t01.ACCESS_C };
+                    string[] t01Val = { szT01_Access };
+                    t01.update_By_ID(t01Col, t01Val, szT01_ID);
+                    goto Next;
+                }
+
+                if (colAction.Substring(0, 1) == "_")
+                {
+                    //update S03
+                    int szS03_ID = Convert.ToInt32(values[0]);
+                    string szS03_Access = values[1];
+                    int[] s03Col = { s03.ACCESS_C };
+                    string[] s03Val = { szS03_Access };
+                    s03.update_By_ID(s03Col, s03Val, szS03_ID);
+                }
+                else
+                {
+                    //insert S03
+                    int[] s03Col = { s03.A02_ID_C,
+                                   /*  s03.S02_ID_C,*/
+                                     s03.S01_ID_C,
+                                     s03.ACCESS_C
+                                   };
+                    string[] s03Val = { values[0], /*S03_A02_ID*/
+                                       /* values[1], /*S03_S02_ID = blank*/  
+                                        values[2], /*S03_S01_ID*/  
+                                        values[3], /*S03_ACCESS*/
+                                      };
+                    s03.AddValues(s03Col, s03Val);
+                }
+            Next:
+                if (ix == dgvCount - 1)
+                    goto FinalStep;
+                ix++;
+            }
+        FinalStep:
+            btn_Enquire_Click(sender, e);
+            return;
+        }
+
+        private void btn_AddMenuLevel_Click(object sender, EventArgs e)
+        {
+            //Show this option for super Administrator only.
+            c_Shared shr = new c_Shared();
+            ML_MenuLevel ML = new ML_MenuLevel();
+            ML.ShowDialog();
+            if (!ML.Saved)
+                return;
+            cmb_ID.Text = ML.MenuLevel;
+            btn_Enquire_Click(sender, e);
+        }
+
+        #endregion
+
+
+
+        #region Private Functions
 
         private void LoadDefaults()
         {
@@ -149,7 +344,7 @@ namespace TINPOS_Project.Window_Forms.Admin
             //Search for S03
             szA02_ID = Int32.Parse(szA02Data.Rows[0][a02.Columns_C[a02.ID_C]].ToString());
             int[] col = {s03.A02_ID_C};
-            int[] val = { szA02_ID };
+            string[] val = { szA02_ID.ToString() };
             DataTable szS03Data = s03.get_All_By(col, val);
             if (szS03Data.Rows.Count == 0)
             {
@@ -187,7 +382,7 @@ namespace TINPOS_Project.Window_Forms.Admin
 
             //Get S02
             int[] s02Col = {s02.ID_C};
-            int[] s02Val = {szS02_ID};
+            string[] s02Val = {szS02_ID.ToString()};
             DataTable szTempS02 = s02.get_All_By(s02Col, s02Val);
             cmb_Parent.Text = szTempS02.Rows[0][s02.Columns_C[s02.Group_Name_C]].ToString();
             cmb_Child.Text = szA02Data.Rows[0][a02.Columns_C[a02.UserID_C]].ToString();
@@ -198,7 +393,7 @@ namespace TINPOS_Project.Window_Forms.Admin
         Display_DGV: //Search for T01
             DataTable szT01Data = new DataTable();
             int[] t01Col = {t01.S02_ID_C};
-            int[] t01Val = {szS02_ID };
+            string[] t01Val = {szS02_ID.ToString() };
             szT01Data = t01.get_All_By(t01Col, t01Val);
             int szRowCount = szT01Data.Rows.Count;
             int szDataNo = 0;
@@ -231,18 +426,18 @@ namespace TINPOS_Project.Window_Forms.Admin
                 if (szMenuLevel)
                     szDgv_ID = "S02_" + szT01_ID;
                 else if (szS03_ID == 0)
-                    szDgv_ID = "T01_" + szT01_ID;
+                    szDgv_ID = "S01_" + szT01_S01_ID;
                 else
                     szDgv_ID = "S03_" + szS03_ID;
 
                 //Get S01
                 int[] s01Col = { s01.ID_C };
-                int[] s01Val = { szT01_S01_ID };
+                string[] s01Val = { szT01_S01_ID.ToString() };
                 DataTable szTempData = s01.get_All_By(s01Col, s01Val);
                 int szS00_ID = Convert.ToInt32(szTempData.Rows[0][s01.S00_ID_C]);
                 //Get ScreenName
                 int[] s00Col = { s00.ID_C };
-                int[] s00Val = { szS00_ID };
+                string[] s00Val = { szS00_ID.ToString() };
                 DataTable szS00Data = s00.get_All_By(s00Col, s00Val);
                 string szScreen = szS00Data.Rows[0][s00.Screen_C].ToString();
                 string szScreenDesc = szS00Data.Rows[0][s00.Description_C].ToString();
@@ -258,7 +453,36 @@ namespace TINPOS_Project.Window_Forms.Admin
                     dgv_Main.Rows.Insert(ix, "S00_" + szS00_ID, szDataNo, szScreen, szScreenDesc, 0, 0, "");
                 }
 
-                if (szPrevScreen != szScreen || ix == szRowCount - 1)
+                if (szPrevScreen != szScreen)
+                {
+                    if (szScreenTrans_P_Checked == 0)
+                        dgv_Screen_CheckState(szScreenRowIndex, 0, true);
+                    else if (szScreenTrans_P_Checked == szScreenCount)
+                        dgv_Screen_CheckState(szScreenRowIndex, 1, true);
+                    else
+                        dgv_Screen_CheckState(szScreenRowIndex, 2, true);
+
+                    if (szScreenTrans_C_Checked == 0)
+                        dgv_Screen_CheckState(szScreenRowIndex, 0, false);
+                    else if (szScreenTrans_C_Checked == szScreenCount)
+                        dgv_Screen_CheckState(szScreenRowIndex, 1, false);
+                    else
+                        dgv_Screen_CheckState(szScreenRowIndex, 2, false);
+
+                    szScreenRowIndex = ix + szDataNo;
+                    dgv_Main.Rows.Insert(szScreenRowIndex, "S00_" + szS00_ID, szDataNo + 1, szScreen, szScreenDesc, 0, 0, "");
+                    szPrevScreen = szScreen;
+                    szDataNo++;
+                    szScreenTrans_P_Checked = 0;
+                    szScreenTrans_C_Checked = 0;
+                    szScreenCount = 0;
+                }
+                dgv_Main.Rows.Insert(ix + szDataNo, szDgv_ID, "", "", szTransactionName, szT01_Access, sz_Extra_Access, "");
+                szScreenCount++;
+                szScreenTrans_P_Checked = szScreenTrans_P_Checked + szT01_Access;
+                szScreenTrans_C_Checked = szScreenTrans_C_Checked + sz_Extra_Access;
+
+                if (ix == szRowCount - 1)
                 {
                     if (szScreenTrans_P_Checked == 0)
                         dgv_Screen_CheckState(szScreenRowIndex, 0, true);
@@ -274,70 +498,11 @@ namespace TINPOS_Project.Window_Forms.Admin
                     else
                         dgv_Screen_CheckState(szScreenRowIndex, 2, false);
                 }
-
-                if (szPrevScreen != szScreen)
-                {
-                    szScreenRowIndex = ix + szDataNo;
-                    dgv_Main.Rows.Insert(szScreenRowIndex, "S00_" + szS00_ID, szDataNo + 1, szScreen, szScreenDesc, 0, 0, "");
-                    szPrevScreen = szScreen;
-                    szDataNo++;
-                    szScreenTrans_P_Checked = 0;
-                    szScreenTrans_C_Checked = 0;
-                    szScreenCount = 0;
-                }
-                dgv_Main.Rows.Insert(ix + szDataNo, szDgv_ID, "", "", szTransactionName, szT01_Access, sz_Extra_Access, "");
-                szScreenCount++;
-                szScreenTrans_P_Checked = szScreenTrans_P_Checked + szT01_Access;
-                szScreenTrans_C_Checked = szScreenTrans_C_Checked + sz_Extra_Access;
             }
-           // tempjay
-            dataGridView1.DataSource = queryTable;
             return;
         Exit:
             shr.ErrorMessage("SM_Enquire()", shr.errMsg);
 
-        }
-       
-        private void btn_Enquire_Click(object sender, EventArgs e)
-        {
-            Cursor.Current = Cursors.WaitCursor;
-            LoadDefaults();
-            Enquire();
-            EnableButtons();
-            Cursor.Current = Cursors.Default;
-        }
-
-        private void dgv_Main_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
-        {
-            DataGridViewCellStyle style =
-               dgv_Main.ColumnHeadersDefaultCellStyle;
-            style.Font = new Font(dgv_Main.Font, FontStyle.Bold);
-            dgv_Main.RowHeadersVisible = false;
-            dgv_Main.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgv_Main.MultiSelect = false;
-
-           //foreach(DataGridViewRow row in dgv_Main.Rows)
-           // if (Convert.ToInt32(row.Cells[dgc_ExtraScreen].Value) != Convert.ToInt32(row.Cells[dgc_ParentAccess].Value))
-           // {
-           //     if (Convert.ToInt32(row.Cells[dgc_ExtraScreen].Value) == 0)
-           //     {
-           //         row.DefaultCellStyle.BackColor = Color.Red;
-           //         row.DefaultCellStyle.ForeColor = Color.White;
-           //     }
-           //     else if (Convert.ToInt32(row.Cells[dgc_ExtraScreen].Value) == 2)
-           //         row.DefaultCellStyle.BackColor = Color.LightGreen;
-           //     else
-           //         row.DefaultCellStyle.BackColor = Color.Green;
-           // }
-              
-
-            //foreach (DataGridViewRow row in dgv_Main.Rows)
-               
-        }
-
-        private void dgv_Main_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            dgv_SelectedRowIndex = dgv_Main.SelectedCells[0].RowIndex;
         }
 
         private void dgv_Screen_CheckState(int rowIndex, int checkState, bool parent)
@@ -409,7 +574,7 @@ namespace TINPOS_Project.Window_Forms.Admin
                 shr.errMsg = "btn_Add_Click: Cannot insert value if A02_ID is zero.";
                 goto Exit;
             }
-            if (szTable == "T01_")
+            if (szTable == "S01_")
             {
                 //Insert Values
                 queryTable.Rows.Add(row_idx, szTransaction + szaction, Insert_Values(szID, szExt_access));
@@ -427,7 +592,7 @@ namespace TINPOS_Project.Window_Forms.Admin
             {               
                 int ix = 0;
                 int[] s01Col = { s01.S00_ID_C };
-                int[] s01Val = { szID };
+                string[] s01Val = { szID.ToString() };
                 DataTable szS01Data = s01.get_All_By(s01Col, s01Val);
                 var result = from myResult in szS01Data.AsEnumerable()
                              select myResult;
@@ -450,7 +615,7 @@ namespace TINPOS_Project.Window_Forms.Admin
                     int szS03_ID = 0;
                     bool hasS03S01 = false;
                     int[] s03col = { s03.A02_ID_C };
-                    int[] s03val = { szA02_ID };
+                    string[] s03val = { szA02_ID.ToString() };
                     DataTable szS03Data = s03.get_All_By(s03col, s03val);
                     var s03result = from mys03result in szS03Data.AsEnumerable()
                                     select mys03result;
@@ -468,7 +633,7 @@ namespace TINPOS_Project.Window_Forms.Admin
                     }
 
                     if (!hasS03S01)
-                        queryTable.Rows.Add(row_idx + ix, szScreen + szaction, szA02_ID + ", ," + szS01_ID + "," + szExt_access);
+                        queryTable.Rows.Add(row_idx + ix, szScreen + szaction, szA02_ID + "," + string.Empty + "," + szS01_ID + "," + szExt_access);
                     else
                         queryTable.Rows.Add(row_idx + ix, "_" + szScreen + szaction, szS03_ID + "," + szExt_access);
 
@@ -490,7 +655,7 @@ namespace TINPOS_Project.Window_Forms.Admin
                 //from s01, get T01 where S02_ID == szS02_ID
                 int ix = 0;
                 int[] s01Col = { s01.S00_ID_C };
-                int[] s01Val = { szID };
+                string[] s01Val = { szID.ToString() };
                 DataTable szS01Data = s01.get_All_By(s01Col, s01Val);
                 var result = from myResult in szS01Data.AsEnumerable()
                               select myResult;
@@ -510,7 +675,7 @@ namespace TINPOS_Project.Window_Forms.Admin
                     }
                     int szS01_ID = data.Field<int>(s01.Columns_C[s01.ID_C]);
                     int[] t01Col = {t01.S01_ID_C};
-                    int[] t01Val = {szS01_ID};
+                    string[] t01Val = {szS01_ID.ToString()};
                     DataTable szT01Data = t01.get_All_By(t01Col, t01Val);
                     int szT01_ID = get_ID_from_T01(szT01Data);
                     if (szT01_ID == 0)
@@ -573,9 +738,6 @@ namespace TINPOS_Project.Window_Forms.Admin
 
             szS00_row.Cells[dgc_Indicator].Value = "*";
 
-                //tempjay
-
-                dataGridView1.DataSource = queryTable;
             return;
 
         Exit:
@@ -583,24 +745,16 @@ namespace TINPOS_Project.Window_Forms.Admin
 
         }
 
-
-
-        private void btn_Add_Click(object sender, EventArgs e)
-        {
-            dgvMain_Add_Subtract("Add");
-
-        }
-
         private string Insert_Values(int ID, int Access)
         {
             int[] s01Col = { s01.ID_C };
-            int[] s01Val = { ID };
+            string[] s01Val = { ID.ToString() };
             DataTable szTempData = s01.get_All_By(s01Col, s01Val);
             int szVal_A02_ID = szA02_ID;
             int szVal_S01_ID = Convert.ToInt32(szTempData.Rows[0][s01.ID_C]);
 
             string col_Values = szVal_A02_ID + "," +
-                /*S03_S02_ID = null */ " ," +
+                /*S03_S02_ID = null */ "," +
                                 szVal_S01_ID + "," +
                                  Access;
             return col_Values;
@@ -638,8 +792,6 @@ namespace TINPOS_Project.Window_Forms.Admin
 
             if (ExtraScreen != extra_Screen_Access)
                 dgv_Rows.Cells[dgc_ExtraScreen].Value = extra_Screen_Access;
-
-
         }
 
         private bool HasRowIndicator(int rowIndex)
@@ -675,158 +827,7 @@ namespace TINPOS_Project.Window_Forms.Admin
             return 0;
         }
 
-        private void btn_Subtract_Click(object sender, EventArgs e)
-        {
-            dgvMain_Add_Subtract("Subtract");
-        }
-
-        private void cmb_ID_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode != Keys.Enter)
-                return;
-            btn_Enquire_Click( sender, e);
-        }
-
-        private void btn_Back_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void btn_UpdateLink_Click(object sender, EventArgs e)
-        {
-            
-            c_Shared shr = new c_Shared();
-            if (cmb_Parent.Text == string.Empty)
-                return;
-            if (cmb_Child.Text == string.Empty)
-                return;
-
-            string szUsrID = cmb_Child.Text.ToUpper();
-            string szMenuLevel = cmb_Parent.Text.ToUpper();
-            cmb_ID.Text = szUsrID;
-
-            //search if userID Exists in A02.
-            DataTable szA02Data = new DataTable();
-            szA02Data = a02.get_By_UserID(szUsrID);
-            if (szA02Data.Rows.Count == 0)
-            {
-                shr.errMsg = "User ID not Found";
-                goto Exit;
-            }
-            szA02_ID = Int32.Parse(szA02Data.Rows[0][a02.Columns_C[a02.ID_C]].ToString());
-
-            //search if menu level exists in S02.
-            DataTable szS02Data = new DataTable();
-            szS02Data = db.Get_All(s02.TableName);
-            var szResult = from myResult in szS02Data.AsEnumerable()
-                           where myResult.Field<string>(s02.Columns_C[s02.Group_Name_C].ToString()) == szMenuLevel
-                           select myResult;
-            foreach (var result in szResult)
-            {
-                szS02_ID = result.Field<int>(s02.Columns_C[s02.ID_C]);
-            }
-
-            //search if userID and Menu level exist in S03.
-            int[] column = { s03.A02_ID_C,
-                             s03.S02_ID_C };
-            int[] values = { szA02_ID,
-                             szS02_ID };
-            DataTable szS03Data = s03.get_All_By(column, values);
-            if (szS03Data.Rows.Count == 0)
-            {
-               //Insert values to S03
-
-                string[] s03Values ={szA02_ID.ToString(),
-                                     szS02_ID.ToString(),
-                                     ""/*S03_S01_ID = null*/,
-                                     ""};
-                s03.AddValues(s03Values);
-                btn_Enquire_Click(sender, e);
-                return;
-            }
-               //Update Menu Level in S03
-
-
-
-            return;
-        Exit:
-            shr.ErrorMessage("SM_Link()", shr.errMsg);
-
-        }
-
-        private void btn_Update_Click(object sender, EventArgs e)
-        {
-            //
-            if (queryTable.Rows.Count == 0)
-                return;
-            
-            DataGridView dgv = new DataGridView();
-            dataGridView1.DataSource = queryTable;
-
-            int dgvCount = dataGridView1.Rows.Count;
-            int ix = 1;
-            foreach( DataGridViewRow dgvRow in dataGridView1.Rows){
-
-                string colAction = dgvRow.Cells[1].Value.ToString();
-                string colValues = dgvRow.Cells[2].Value.ToString();
-                string[] values = colValues.Split(',');
-
-                if (szMenuLevel)
-                {
-                    //Update T01
-                    int szT01_ID = Convert.ToInt32(values[0]);
-                    string szT01_Access = values[1].ToString();
-                    int[] t01Col = { t01.ACCESS_C };
-                    string[] t01Val = { szT01_Access };
-                    t01.update_By_ID(t01Col, t01Val, szT01_ID);
-                    goto Next;
-                }
-               
-                if (colAction.Substring(0, 1) == "_")
-                {
-                    //update S03
-                    int      szS03_ID     = Convert.ToInt32(values[0]);
-                    string   szS03_Access = values[1];
-                    int[]    s03Col       = {s03.ACCESS_C};
-                    string[] s03Val       = {szS03_Access};
-                    s03.update_By_ID(s03Col, s03Val, szS03_ID);
-                } 
-                else
-                {
-                    //insert S03
-                    string[] s03Val = { values[0], /*S03_A02_ID*/
-                                        values[1], /*S03_S02_ID = blank*/  
-                                        values[2], /*S03_S01_ID*/  
-                                        values[3], /*S03_ACCESS*/
-                                      };
-                    s03.AddValues(s03Val);
-
-                }
-
-            Next:
-                if (ix == dgvCount - 1)
-                    goto FinalStep;
-                ix++;
-            }
-            FinalStep:
-            btn_Enquire_Click(sender,e);
-            return;
-
-        }
-
-       
-
-
-
-
-
-       
-
-     
-
-      
-
-        
+        #endregion
 
     }
 }

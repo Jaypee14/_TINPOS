@@ -34,3 +34,4 @@ D:\TINPOS Directory\TINPOS_Project\_TINPOS\TINPOS_Project\obj\Debug\TINPOS_Proje
 D:\TINPOS Directory\TINPOS_Project\_TINPOS\TINPOS_Project\obj\Debug\TINPOS_Project.w_Main.resources
 D:\TINPOS Directory\TINPOS_Project\_TINPOS\TINPOS_Project\obj\Debug\TINPOS_Project.Properties.Resources.resources
 D:\TINPOS Directory\TINPOS_Project\_TINPOS\TINPOS_Project\obj\Debug\TINPOS_Project.csproj.GenerateResource.Cache
+D:\TINPOS Directory\TINPOS_Project\_TINPOS\TINPOS_Project\obj\Debug\TINPOS_Project.Window_Forms.Admin.ML_MenuLevel.resources

@@ -69,7 +69,7 @@ namespace TINPOS_Project.Class
 
         }
 
-        public string[] TX_Get(string txName){ //Get TX from DAT file.
+        public string[,] TX_Get(string txName){ //Get TX from DAT file.
             
             int txLineNumber = 0;
             string txColNum = "";
@@ -101,13 +101,15 @@ namespace TINPOS_Project.Class
             if (szColNum <= 0)
                 goto ErrorMessage;
 
-            String[] txTable = new String[szColNum]; 
+            String[,] txTable = new String[szColNum, 2]; 
             int ix = 0;
             foreach (var szLineValues in File.ReadLines(txdat_File)
                           .Select((text, index) => new { text, lineNumber = index + 1 })
                           .Where(x => x.lineNumber > txLineNumber))
             {
-                txTable[ix] = szLineValues.text.Replace(line_DELIM, string.Empty);
+                string[] line = szLineValues.text.Split(',');
+                txTable[ix, 0] = line[0];
+                txTable[ix, 1] = line[1];
                 if (szLineValues.text.Contains(mess_DELIM))
                 {
                     goto NextSentence;
@@ -116,7 +118,7 @@ namespace TINPOS_Project.Class
             }
 
         NextSentence:
-        txTable[ix] = txTable[ix].ToString().Replace(mess_DELIM, string.Empty);
+        txTable[ix,1] = txTable[ix,1].ToString().Replace(mess_DELIM, string.Empty);
         return txTable;
 
         ErrorMessage:
@@ -158,7 +160,7 @@ namespace TINPOS_Project.Class
                 }
             }
   
-            S01.AddValues(Values);
+           // S01.AddValues(Values);
             STAGE++;
             goto _START;
             //Add function to All S02

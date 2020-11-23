@@ -56,6 +56,12 @@
     <Compile Include="Class\POSDatabase\S02.cs" />
     <Compile Include="Class\POSDatabase\S03.cs" />
     <Compile Include="Class\POSDatabase\S01.cs" />
+    <Compile Include="Window Forms\Admin\ML_MenuLevel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Window Forms\Admin\ML_MenuLevel.Designer.cs">
+      <DependentUpon>ML_MenuLevel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Window Forms\Admin\SM_SecurityMaintenance.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -76,6 +82,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Window Forms\Admin\ML_MenuLevel.resx">
+      <DependentUpon>ML_MenuLevel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Window Forms\Admin\SM_SecurityMaintenance.resx">
       <DependentUpon>SM_SecurityMaintenance.cs</DependentUpon>
     </EmbeddedResource>

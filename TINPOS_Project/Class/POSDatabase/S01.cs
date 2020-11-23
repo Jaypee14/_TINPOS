@@ -10,6 +10,8 @@ namespace TINPOS_Project.Class.POSDatabase
     class S01
     {
         public String TableName = "S01_SCRN_TRANS";
+        public String[,] TXTable;
+        public String[] Type_C;
         public String[] Columns_C;
         public int ID_C = 0,
                     GUID_C = 1,
@@ -21,40 +23,62 @@ namespace TINPOS_Project.Class.POSDatabase
         public int ID;
 
 
-
         public void Initialization()
         {
             c_Shared shr = new c_Shared();
-            Columns_C = shr.TX_Get("TXS01");
-        }
-
-        public string[] getColumnName(int[] colIndex)
-        {
-            int colCount = colIndex.Count();
-            string[] columns = new string[colCount];
+            TXTable = shr.TX_Get("TXS01");
+            int colCount = TXTable.GetLength(0);
+            string[] Columns = new string[colCount];
+            string[] Type = new string[colCount];
             for (int ix = 0; ix < colCount; ix++)
             {
-                columns[ix] = Columns_C[colIndex[ix]];
+                Columns[ix] = TXTable[ix, 0];
+                Type[ix] = TXTable[ix, 1];
             }
-            return columns;
+            Columns_C = Columns;
+            Type_C = Type;
         }
 
-        public void AddValues(String[] Values)
+        /// <summary>
+        /// Add values into Table
+        /// </summary>
+        /// <param name="colIndex">Column index to add</param>
+        /// <param name="Values">Values</param>
+        public void AddValues(int[] colIndex, String[] Values)
         {
             c_Database db = new c_Database();
             c_Shared shr = new c_Shared();
             Initialization();
 
-            int ix = Values.GetLength(0);
-            for (int i = 0; i < ix; i++)
+            int valCount = Values.GetLength(0);
+            if (valCount <= 0)
             {
-                if (Values[i] == "")
-                {
-                    shr.errMsg = "Invalid Transaction Name";
-                    goto ErrorMsg;
-                }
+                shr.errMsg = "No Values to Add.";
+                goto ErrorMsg;
             }
-            db.INSERT_INTO(TableName, Columns_C, Values); 
+
+            string[,] defaultColumns = {
+                                      {TXTable[ID_C,0],TXTable[ID_C,1]}, //TableID
+                                      {TXTable[GUID_C,0],TXTable[GUID_C,1]} //GUID
+                                    };
+            string[,] columnsToAdd = getColumnName(colIndex);
+
+            int defColCount = defaultColumns.GetLength(0);
+            int colCount = defColCount + columnsToAdd.GetLength(0);
+            string[,] columns = new string[colCount, 2];
+            for (int i = 0; i < colCount; i++)
+            {
+                if (i < defColCount)
+                {
+                    columns[i, 0] = defaultColumns[i, 0];
+                    columns[i, 1] = defaultColumns[i, 1];
+                    continue;
+                }
+                columns[i, 0] = columnsToAdd[i - defColCount, 0];
+                columns[i, 1] = columnsToAdd[i - defColCount, 1];
+            }
+
+            db.INSERT_INTO(TableName, columns, Values);
             return;
 
 
@@ -62,13 +86,26 @@ namespace TINPOS_Project.Class.POSDatabase
             shr.ErrorMessage("S01_AddValues()", shr.errMsg);
         }
 
+
+        public string[,] getColumnName(int[] colIndex)
+        {
+            int colCount = colIndex.Count();
+            string[,] columns = new string[colCount, 2];
+            for (int ix = 0; ix < colCount; ix++)
+            {
+                columns[ix, 0] = TXTable[colIndex[ix], 0];
+                columns[ix, 1] = TXTable[colIndex[ix], 1];
+            }
+            return columns;
+        }
+
         /// <summary>
-        /// Get all by column Index. For Int data types only
+        /// Get all by column Index.
         /// </summary>
-        /// <param name="colIndex">Column Index. Column type must be Int.</param>
-        /// <param name="_ID">Value of ID to search</param>
+        /// <param name="colIndex">Column Index.</param>
+        /// <param name="values">Value to search</param>
         /// <returns></returns>
-        public DataTable get_All_By(int[] colIndex, int[] values)
+        public DataTable get_All_By(int[] colIndex, string[] values)
         {
             c_Shared shr = new c_Shared();
             c_Database db = new c_Database();
@@ -83,7 +120,7 @@ namespace TINPOS_Project.Class.POSDatabase
                 goto Exit;
             }
 
-            string[] columns = getColumnName(colIndex);
+            string[,] columns = getColumnName(colIndex);
             DataTable szData = db.Get_All_By(TableName, columns, values);
             return szData;
 
