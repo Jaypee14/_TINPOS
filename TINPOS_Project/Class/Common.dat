@@ -1,49 +1,54 @@
-﻿ ********************FORMAT*******************
- * (TXNAME),_columncount                     *
- * colname1, *must match the database table  *
- * lastcol;  *must have ';'                  *
- *********************************************
+﻿********************FORMAT*******************************
+ * (TXNAME),_columncount                                 *
+ * colname1,9 *must match the database table, Data type  *
+ * lastcol;  *must have ';'                              *
+ * Data Types:                                           *
+ *          9 = Int                                      *
+ *          G = GUID                                     *
+ *          X = String                                   *
+ *                                                       *
+ *********************************************************
 
- (TXA02),_7
-A02_ID,
-A02_GUID,
-A02_USERID,
-A02_FIRSTNAME,
-A02_LASTNAME,
-A02_PASSWORD,
-A02_CREATEDBY;
+(TXA02),_7
+A02_ID,9
+A02_GUID,G
+A02_USERID,X
+A02_FIRSTNAME,X
+A02_LASTNAME,X
+A02_PASSWORD,X
+A02_CREATEDBY,X;
 
 (TXS00),_4
-S01_ID,
-S01_GUID,
-S01_Screen,
-S01_Description;
+S00_ID,9
+S00_GUID,G
+S00_Screen,X
+S00_Description,X;
 
 (TXS01),_5
-S01_ID,
-S01_GUID,
-S01_Transaction,
-S01_Description,
-S01_S00_ID;
+S01_ID,9
+S01_GUID,G
+S01_Transaction,X
+S01_Description,X
+S01_S00_ID,9;
 
 (TXS02),_4
-S02_ID,
-S02_GUID,
-S02_GROUP_NAME,
-S02_DESCRIPTION;
+S02_ID,9
+S02_GUID,G
+S02_GROUP_NAME,X
+S02_DESCRIPTION,X;
 
 
 (TXS03),_6
-S03_ID,
-S03_GUID,
-S03_A02_ID,
-S03_S02_ID,
-S03_S01_ID,
-S03_ACCESS;
+S03_ID,9
+S03_GUID,G
+S03_A02_ID,9
+S03_S02_ID,9
+S03_S01_ID,9
+S03_ACCESS,X;
 
 (TXT01),_5
-T01_ID,
-T01_GUID,
-T01_S02_ID,
-T01_S01_ID,
-T01_ACCESS;
+T01_ID,9
+T01_GUID,G
+T01_S02_ID,9
+T01_S01_ID,9
+T01_ACCESS,X;

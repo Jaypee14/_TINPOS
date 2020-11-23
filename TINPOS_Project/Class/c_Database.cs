@@ -99,47 +99,51 @@ namespace TINPOS_Project.Class
             }
         }
 
-        public void INSERT_INTO(String TableName, String[] ColumnName , String[] Values)
+        public void INSERT_INTO(String TableName, String[,] ColumnName , String[] Values)
         {
             Boolean hasGuid = false;
             String szColumnNames = "";
             String szValues = "";
-            int szColCount = ColumnName.Count();
+            int szColCount = ColumnName.GetLength(0);
             int szRowCount = Values.Count();
             string szTableID = TableName.Substring(0, 4) + "ID";
 
-            int ix = 0;
-            var szCheckColumns = from szColName in ColumnName
-                              select szColName;
-            foreach (var szColName in szCheckColumns)
+            if ((szColCount - 2) != szRowCount) //Less 2 because ID and GUID has default values
             {
-
-                if (szColName == szTableID)
-                    goto Next;
-
-                if (szColName.Contains("_GUID"))
-                    hasGuid = true;
-
-                szColumnNames = szColumnNames + szColName;
-
-                if (ix != szColCount - 1)
-                    szColumnNames = szColumnNames + ", ";
-            Next:
-                ix++;
+                shr.errMsg = "Columns and Values does not match.";
+                goto ErrorMsg;
             }
 
-            ix = 0;
-            if (hasGuid)
-                szValues = "@guidValue, ";
-            var szCheckValues = from szVal in Values
-                                select szVal;
-            foreach (var szVal in szCheckValues)
+            for (int ix = 0; ix < szColCount; ix++)
             {
-                szValues = szValues + "'" + szVal + "'";
+                if (ColumnName[ix, 0] == szTableID)
+                    continue;
 
-                if (ix != szRowCount - 1)
+                if (ColumnName[ix, 0].Contains("_GUID"))
+                    hasGuid = true;
+
+                szColumnNames = szColumnNames + ColumnName[ix, 0];
+               
+
+                if (ColumnName[ix,1].Contains('G')) //GUID
+                    szValues = "@guidValue";
+
+                else if (ColumnName[ix, 1].Contains('9')) //Int
+                {
+                    if (Values[ix - 2] != string.Empty)
+                        szValues = szValues + Values[ix - 2];
+                    else
+                        szValues = szValues + 0;
+                }
+
+                else if (ColumnName[ix, 1].Contains('X')) //String
+                    szValues = szValues + "'" + Values[ix-2] + "'";
+
+                if (ix != szColCount - 1)
+                {
+                    szColumnNames = szColumnNames + ", ";
                     szValues = szValues + ", ";
-                ix++;
+                }
             }
        
             dbOpen();
@@ -174,7 +178,7 @@ namespace TINPOS_Project.Class
             return;
 
         ErrorMsg:
-            shr.ErrorMessage("InsertInto()", shr.errMsg);
+            shr.ErrorMessage("InsertInto() " + TableName + ": ", shr.errMsg);
         
         }
 
@@ -185,11 +189,11 @@ namespace TINPOS_Project.Class
             return szData;
         }
 
-        public DataTable Get_All_By(string TableName, string[] columns, int[] values)
+        public DataTable Get_All_By(string TableName, string[,] columns, string[] values)
         {
            
             //check if both have same length.
-            int colCount = columns.Count();
+            int colCount = columns.GetLength(0);
             int valCount = values.Count();
 
             if (colCount != valCount)
@@ -202,7 +206,12 @@ namespace TINPOS_Project.Class
 
             for (int ix = 0; ix < colCount; ix++)
             {
-                q_condition = q_condition + columns[ix] + " = " + values[ix];
+                if (columns[ix,1].Contains('9')) //Integer
+                    q_condition = q_condition + columns[ix, 0] + " = " + values[ix];
+               
+                else if(columns[ix,1].Contains('X')) //String
+                    q_condition = q_condition + columns[ix, 0] + " = '" + values[ix] + "'";
+
                 if (ix < colCount - 1)
                     q_condition = q_condition + " and ";
             }
@@ -217,10 +226,10 @@ namespace TINPOS_Project.Class
             return null;
         }
 
-        public void Update_Table(string TableName, string[] Columns, string[] Values, string Condition)
+        public void Update_Table(string TableName, string[,] Columns, string[] Values, string Condition)
         {
             //check if both have same length.
-            int colCount = Columns.Count();
+            int colCount = Columns.GetLength(0);
             int valCount = Values.Count();
             if (colCount != valCount)
             {
@@ -232,7 +241,12 @@ namespace TINPOS_Project.Class
 
             for (int ix = 0; ix < colCount; ix++)
             {
-                q_set = q_set + Columns[ix] + " = " + Values[ix];
+                if(Columns[ix,1].Contains('9')) //Int
+                    q_set = q_set + Columns[ix, 0] + " = " + Values[ix];
+             
+                else if (Columns[ix, 1].Contains('X')) //String
+                    q_set = q_set + Columns[ix, 0] + " = '" + Values[ix] + "'";
+
                 if (ix < colCount - 1)
                     q_set = q_set + ", ";
             }
