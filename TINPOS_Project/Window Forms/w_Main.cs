@@ -19,6 +19,7 @@ namespace TINPOS_Project
         //INITIALIZE CLASSES
       
         c_Shared shr = new c_Shared();
+        c_Tinposparm tp = new c_Tinposparm();
         //S02 s02 = new S02();
 
         //INITIALIZE FORMS
@@ -29,16 +30,15 @@ namespace TINPOS_Project
         public w_Main()
         {
             InitializeComponent();
+            tp.Initialization();
 
             //SET PARENT FORM
 
 
             //      shr.Initialize_TX();
 
-            //s02.Initialization();
-            ////shr.CreateDir("DAT", "Common.dat");
-            //String[] add_Product = { "update_A03_Product", "Update Product", "PR" };
-            //shr.txFunction(add_Product);
+            shr.CreateDir("DAT", "Common.dat");
+
             
 
         }

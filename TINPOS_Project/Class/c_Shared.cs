@@ -223,8 +223,9 @@ namespace TINPOS_Project.Class
 
             string targetPath = TINPOS + "\\" + path + "\\" + fileName;
 
-            if (!File.Exists(TINPOS + "\\" + path + "\\" + fileName))
-                File.Copy(CommonSource, targetPath);
+            if (File.Exists(targetPath))
+                File.Delete(targetPath);
+            File.Copy(CommonSource, targetPath);
 
         }
 

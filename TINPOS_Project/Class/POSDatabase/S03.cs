@@ -159,8 +159,22 @@ namespace TINPOS_Project.Class.POSDatabase
         Exit:
             shr.ErrorMessage(TableName + "update_By_ID() ", shr.errMsg);
         }
-       
 
+         public int get_MenuLevel(int userID)
+         {
+             int menuID = 0; 
+             int[] col = { A02_ID_C };
+             string[] val = { userID.ToString() };
+             DataTable data = get_All_By(col, val);
+             data.DefaultView.Sort = Columns_C[S02_ID_C] + " desc";
+             data = data.DefaultView.ToTable();
+             if (data.Rows.Count > 0)
+             {
+                 DataRow row = data.Rows[0];
+                 menuID = Convert.ToInt32(row[S02_ID_C]);
+             }
+             return menuID;
+         }
 
     }
 }

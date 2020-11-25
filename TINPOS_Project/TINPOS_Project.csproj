@@ -49,6 +49,7 @@
     <Compile Include="Class\c_Encryption.cs" />
     <Compile Include="Class\c_Rights.cs" />
     <Compile Include="Class\c_Shared.cs" />
+    <Compile Include="Class\c_Tinposparm.cs" />
     <Compile Include="Class\c_TX_Database.cs" />
     <Compile Include="Class\POSDatabase\A02.cs" />
     <Compile Include="Class\POSDatabase\S00.cs" />
