@@ -25,6 +25,8 @@ namespace TINPOS_Project.Window_Forms.Admin
         S03 s03 = new S03();
         T01 t01 = new T01();
         c_Database db = new c_Database();
+
+
         
         
         //dgv_Main_Colnumbers
@@ -61,6 +63,7 @@ namespace TINPOS_Project.Window_Forms.Admin
             s02.Initialization();
             s03.Initialization();
             t01.Initialization();
+
 
             LoadDefaults();
         }
@@ -262,6 +265,9 @@ namespace TINPOS_Project.Window_Forms.Admin
 
         private void LoadDefaults()
         {
+           
+
+
             cmb_ID.Text = cmb_ID.Text.ToUpper();
 
             cmb_Parent.Text = string.Empty;
@@ -280,6 +286,15 @@ namespace TINPOS_Project.Window_Forms.Admin
             dgv_SelectedRowIndex = 0;
 
             dgv_Main.Rows.Clear();
+
+            
+            //if (p.add_S02_MenuLevel) //Transaction
+            //    btn_AddMenuLevel.Visible = true;
+            //else
+            //    btn_AddMenuLevel.Visible = false;
+
+            //how to initialize a class once and use the value in all class???????
+            
         }
         private void EnableButtons()
         {

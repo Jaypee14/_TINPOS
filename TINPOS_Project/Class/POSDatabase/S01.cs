@@ -59,7 +59,8 @@ namespace TINPOS_Project.Class.POSDatabase
 
             string[,] defaultColumns = {
                                       {TXTable[ID_C,0],TXTable[ID_C,1]}, //TableID
-                                      {TXTable[GUID_C,0],TXTable[GUID_C,1]} //GUID
+                                      {TXTable[GUID_C,0],TXTable[GUID_C,1]}, //GUID
+                                      {TXTable[Description_C,0], TXTable[Description_C,1]} //Transaction Description
                                     };
             string[,] columnsToAdd = getColumnName(colIndex);
 
@@ -78,7 +79,16 @@ namespace TINPOS_Project.Class.POSDatabase
                 columns[i, 1] = columnsToAdd[i - defColCount, 1];
             }
 
-            db.INSERT_INTO(TableName, columns, Values);
+            String[] newValues = new String[valCount + 1]; //Set default value for Transaction Description.
+            for (int ix = 0; ix < valCount + 1; ix++)
+            {
+                if (ix == 0)
+                    newValues[ix] = shr.toTitleCase(Values[ix].Replace('_', ' '));
+                else
+                    newValues[ix] = Values[ix - 1];
+            }
+
+            db.INSERT_INTO(TableName, columns, newValues);
             return;
 
 
