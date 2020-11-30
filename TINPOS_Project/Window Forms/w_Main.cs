@@ -9,8 +9,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TINPOS_Project.Class;
 using TINPOS_Project.Window_Forms;
-using TINPOS_Project.Class.POSDatabase;
 using TINPOS_Project.Window_Forms.Admin;
+using TINPOS_Project.Class.DbFunction;
+using TINPOS_Project.Class.ProjectClass;
 
 namespace TINPOS_Project
 {
@@ -18,8 +19,9 @@ namespace TINPOS_Project
     {
         //INITIALIZE CLASSES
       
-        c_Shared shr = new c_Shared();
-        c_Tinposparm tp = new c_Tinposparm();
+        Shared shr = new Shared();
+        Tinposparm tp = new Tinposparm();
+        DBQTable a02 = new A02();
         //S02 s02 = new S02();
 
         //INITIALIZE FORMS
@@ -30,14 +32,19 @@ namespace TINPOS_Project
         public w_Main()
         {
             InitializeComponent();
-            tp.Initialization();
+            //tp.Initialization();
 
             //SET PARENT FORM
 
 
             //      shr.Initialize_TX();
 
-            shr.CreateDir("DAT", "Common.dat");
+            tp.User_Transaction_Access("ML", "Menu Level", "delete_S02_MenuLevel", 1);
+            tp.User_Transaction_Access("ML", "Menu Level", "update_S02_MenuLevel", 1);
+
+            //A02 a02 = new A02();
+            //MessageBox.Show(a02.Table.Column.Typeof(a02.FirstName));
+            
 
             
 
