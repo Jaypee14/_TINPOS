@@ -45,18 +45,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class\c_Database.cs" />
+    <Compile Include="Class\DBFunction\DBQStatement.cs" />
     <Compile Include="Class\c_Encryption.cs" />
     <Compile Include="Class\c_Rights.cs" />
-    <Compile Include="Class\c_Shared.cs" />
-    <Compile Include="Class\c_Tinposparm.cs" />
+    <Compile Include="Class\ProjectClass\Files.cs" />
+    <Compile Include="Class\ProjectClass\Requests.cs" />
+    <Compile Include="Class\ProjectClass\Shared.cs" />
+    <Compile Include="Class\ProjectClass\Tinposparm.cs" />
     <Compile Include="Class\c_TX_Database.cs" />
-    <Compile Include="Class\POSDatabase\A02.cs" />
-    <Compile Include="Class\POSDatabase\S00.cs" />
-    <Compile Include="Class\POSDatabase\T01.cs" />
-    <Compile Include="Class\POSDatabase\S02.cs" />
-    <Compile Include="Class\POSDatabase\S03.cs" />
-    <Compile Include="Class\POSDatabase\S01.cs" />
+    <Compile Include="Class\DBTables\T01.cs" />
+    <Compile Include="Class\DBTables\S03.cs" />
+    <Compile Include="Class\DBTables\S02.cs" />
+    <Compile Include="Class\DBFunction\DBQTable.cs" />
+    <Compile Include="Class\DBTables\S01.cs" />
+    <Compile Include="Class\DBTables\S00.cs" />
+    <Compile Include="Class\DBTables\A02.cs" />
+    <Compile Include="Class\ProjectClass\TXTable.cs" />
+    <Compile Include="Class\_Abstract\_Shared.cs" />
+    <Compile Include="Class\_Interface\IDBConnection.cs" />
+    <Compile Include="Class\_Interface\IDBQStatement.cs" />
+    <Compile Include="Class\_Interface\IShared.cs" />
     <Compile Include="Window Forms\Admin\ML_MenuLevel.cs">
       <SubType>Form</SubType>
     </Compile>

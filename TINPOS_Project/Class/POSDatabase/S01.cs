@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TINPOS_Project.Class.POSDatabase
 {
-    class S01
+    class S01old
     {
         public String TableName = "S01_SCRN_TRANS";
         public String[,] TXTable;
@@ -20,7 +20,7 @@ namespace TINPOS_Project.Class.POSDatabase
                     S00_ID_C = 4;
                       
 
-        public int ID;
+    //    public int ID;
 
 
         public void Initialization()

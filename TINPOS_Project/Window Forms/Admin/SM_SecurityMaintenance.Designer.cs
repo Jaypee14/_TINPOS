@@ -36,6 +36,13 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btn_Enquire = new System.Windows.Forms.Button();
             this.dgv_Main = new System.Windows.Forms.DataGridView();
+            this.col_ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.col_No = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.col_Screen = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.col_TransactionName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.col_ParentAccess = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.col_ExtraScreen = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.col_Edited = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.grb_Bottom = new System.Windows.Forms.GroupBox();
             this.btn_Back = new System.Windows.Forms.Button();
             this.btn_AddMenuLevel = new System.Windows.Forms.Button();
@@ -54,13 +61,6 @@
             this.btn_SearchID = new System.Windows.Forms.Button();
             this.grb_TopLeft = new System.Windows.Forms.GroupBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.col_ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.col_No = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.col_Screen = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.col_TransactionName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.col_ParentAccess = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.col_ExtraScreen = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.col_Edited = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dgv_Main)).BeginInit();
             this.grb_Bottom.SuspendLayout();
             this.grb_TopRight.SuspendLayout();
@@ -110,6 +110,79 @@
             this.dgv_Main.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgv_Main_CellClick);
             this.dgv_Main.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dgv_Main_CellPainting);
             // 
+            // col_ID
+            // 
+            this.col_ID.HeaderText = "ID";
+            this.col_ID.Name = "col_ID";
+            this.col_ID.ReadOnly = true;
+            this.col_ID.Visible = false;
+            // 
+            // col_No
+            // 
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.col_No.DefaultCellStyle = dataGridViewCellStyle1;
+            this.col_No.HeaderText = "No";
+            this.col_No.Name = "col_No";
+            this.col_No.ReadOnly = true;
+            this.col_No.Width = 30;
+            // 
+            // col_Screen
+            // 
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.col_Screen.DefaultCellStyle = dataGridViewCellStyle2;
+            this.col_Screen.HeaderText = "Screen";
+            this.col_Screen.Name = "col_Screen";
+            this.col_Screen.ReadOnly = true;
+            this.col_Screen.Width = 50;
+            // 
+            // col_TransactionName
+            // 
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.col_TransactionName.DefaultCellStyle = dataGridViewCellStyle3;
+            this.col_TransactionName.HeaderText = "Transaction Name";
+            this.col_TransactionName.Name = "col_TransactionName";
+            this.col_TransactionName.ReadOnly = true;
+            this.col_TransactionName.Width = 300;
+            // 
+            // col_ParentAccess
+            // 
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.LightGray;
+            dataGridViewCellStyle4.NullValue = System.Windows.Forms.CheckState.Indeterminate;
+            this.col_ParentAccess.DefaultCellStyle = dataGridViewCellStyle4;
+            this.col_ParentAccess.HeaderText = " Parent Access";
+            this.col_ParentAccess.IndeterminateValue = "-1";
+            this.col_ParentAccess.Name = "col_ParentAccess";
+            this.col_ParentAccess.ReadOnly = true;
+            this.col_ParentAccess.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.col_ParentAccess.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.col_ParentAccess.ThreeState = true;
+            this.col_ParentAccess.Width = 60;
+            // 
+            // col_ExtraScreen
+            // 
+            this.col_ExtraScreen.HeaderText = "Extra Access";
+            this.col_ExtraScreen.IndeterminateValue = "-1";
+            this.col_ExtraScreen.Name = "col_ExtraScreen";
+            this.col_ExtraScreen.ReadOnly = true;
+            this.col_ExtraScreen.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.col_ExtraScreen.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.col_ExtraScreen.ThreeState = true;
+            this.col_ExtraScreen.Width = 60;
+            // 
+            // col_Edited
+            // 
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.col_Edited.DefaultCellStyle = dataGridViewCellStyle5;
+            this.col_Edited.HeaderText = "*";
+            this.col_Edited.Name = "col_Edited";
+            this.col_Edited.ReadOnly = true;
+            this.col_Edited.Visible = false;
+            this.col_Edited.Width = 20;
+            // 
             // grb_Bottom
             // 
             this.grb_Bottom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -144,6 +217,7 @@
             this.btn_AddMenuLevel.TabIndex = 4;
             this.btn_AddMenuLevel.Text = "Add Menu Level";
             this.btn_AddMenuLevel.UseVisualStyleBackColor = true;
+            this.btn_AddMenuLevel.Visible = false;
             this.btn_AddMenuLevel.Click += new System.EventHandler(this.btn_AddMenuLevel_Click);
             // 
             // btn_Add
@@ -291,79 +365,6 @@
             this.dataGridView1.Size = new System.Drawing.Size(700, 177);
             this.dataGridView1.TabIndex = 7;
             this.dataGridView1.Visible = false;
-            // 
-            // col_ID
-            // 
-            this.col_ID.HeaderText = "ID";
-            this.col_ID.Name = "col_ID";
-            this.col_ID.ReadOnly = true;
-            this.col_ID.Visible = false;
-            // 
-            // col_No
-            // 
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col_No.DefaultCellStyle = dataGridViewCellStyle1;
-            this.col_No.HeaderText = "No";
-            this.col_No.Name = "col_No";
-            this.col_No.ReadOnly = true;
-            this.col_No.Width = 30;
-            // 
-            // col_Screen
-            // 
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col_Screen.DefaultCellStyle = dataGridViewCellStyle2;
-            this.col_Screen.HeaderText = "Screen";
-            this.col_Screen.Name = "col_Screen";
-            this.col_Screen.ReadOnly = true;
-            this.col_Screen.Width = 50;
-            // 
-            // col_TransactionName
-            // 
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col_TransactionName.DefaultCellStyle = dataGridViewCellStyle3;
-            this.col_TransactionName.HeaderText = "Transaction Name";
-            this.col_TransactionName.Name = "col_TransactionName";
-            this.col_TransactionName.ReadOnly = true;
-            this.col_TransactionName.Width = 300;
-            // 
-            // col_ParentAccess
-            // 
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle4.BackColor = System.Drawing.Color.LightGray;
-            dataGridViewCellStyle4.NullValue = System.Windows.Forms.CheckState.Indeterminate;
-            this.col_ParentAccess.DefaultCellStyle = dataGridViewCellStyle4;
-            this.col_ParentAccess.HeaderText = " Parent Access";
-            this.col_ParentAccess.IndeterminateValue = "-1";
-            this.col_ParentAccess.Name = "col_ParentAccess";
-            this.col_ParentAccess.ReadOnly = true;
-            this.col_ParentAccess.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.col_ParentAccess.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.col_ParentAccess.ThreeState = true;
-            this.col_ParentAccess.Width = 60;
-            // 
-            // col_ExtraScreen
-            // 
-            this.col_ExtraScreen.HeaderText = "Extra Access";
-            this.col_ExtraScreen.IndeterminateValue = "-1";
-            this.col_ExtraScreen.Name = "col_ExtraScreen";
-            this.col_ExtraScreen.ReadOnly = true;
-            this.col_ExtraScreen.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.col_ExtraScreen.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.col_ExtraScreen.ThreeState = true;
-            this.col_ExtraScreen.Width = 60;
-            // 
-            // col_Edited
-            // 
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col_Edited.DefaultCellStyle = dataGridViewCellStyle5;
-            this.col_Edited.HeaderText = "*";
-            this.col_Edited.Name = "col_Edited";
-            this.col_Edited.ReadOnly = true;
-            this.col_Edited.Visible = false;
-            this.col_Edited.Width = 20;
             // 
             // SM_SecurityMaintenance
             // 

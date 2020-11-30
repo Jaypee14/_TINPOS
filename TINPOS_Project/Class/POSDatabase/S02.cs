@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TINPOS_Project.Class.POSDatabase
 {
-    class S02
+    class S02old
     {
         public String TableName = "S02_GROUP_ACCESS";
         public String[,] TXTable;
