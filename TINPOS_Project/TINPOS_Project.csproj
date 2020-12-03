@@ -48,11 +48,18 @@
     <Compile Include="Class\DBFunction\DBQStatement.cs" />
     <Compile Include="Class\c_Encryption.cs" />
     <Compile Include="Class\c_Rights.cs" />
+    <Compile Include="Class\DBTables\DbColumns\t01.cs" />
+    <Compile Include="Class\DBTables\DbColumns\s03.cs" />
+    <Compile Include="Class\DBTables\DbColumns\s02.cs" />
+    <Compile Include="Class\DBTables\DbColumns\s01.cs" />
+    <Compile Include="Class\DBTables\DbColumns\s00.cs" />
+    <Compile Include="Class\DBTables\DbColumns\a02.cs" />
+    <Compile Include="Class\DBTables\DbColumns\zColumn.cs" />
+    <Compile Include="Class\DBTables\DbColumns\zInitialize_Columns.cs" />
     <Compile Include="Class\ProjectClass\Files.cs" />
     <Compile Include="Class\ProjectClass\Requests.cs" />
     <Compile Include="Class\ProjectClass\Shared.cs" />
     <Compile Include="Class\ProjectClass\Tinposparm.cs" />
-    <Compile Include="Class\c_TX_Database.cs" />
     <Compile Include="Class\DBTables\T01.cs" />
     <Compile Include="Class\DBTables\S03.cs" />
     <Compile Include="Class\DBTables\S02.cs" />
@@ -60,9 +67,8 @@
     <Compile Include="Class\DBTables\S01.cs" />
     <Compile Include="Class\DBTables\S00.cs" />
     <Compile Include="Class\DBTables\A02.cs" />
+    <Compile Include="Class\ProjectClass\Transactions.cs" />
     <Compile Include="Class\ProjectClass\TXTable.cs" />
-    <Compile Include="Class\_Abstract\_Shared.cs" />
-    <Compile Include="Class\_Interface\IDBConnection.cs" />
     <Compile Include="Class\_Interface\IDBQStatement.cs" />
     <Compile Include="Class\_Interface\IShared.cs" />
     <Compile Include="Window Forms\Admin\ML_MenuLevel.cs">
@@ -112,6 +118,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
     <None Include="Class\Common.dat" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -127,6 +135,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Class\_Properties\" />
     <Folder Include="Objects\Images\w_Main\" />
   </ItemGroup>
   <ItemGroup>

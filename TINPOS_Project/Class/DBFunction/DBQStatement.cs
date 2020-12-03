@@ -20,18 +20,42 @@ namespace TINPOS_Project.Class.DbFunction
         
         //Variables
         SqlConnection    sql_con;
-       // String conStr = @"Server=192.168.100.12,1005;Initial Catalog=db_POSDatabase;User ID=sa;Password=Jaypz10051";
+        private string Connection { get { return @"Server=192.168.100.12,1005;Initial Catalog=db_POSDatabase;User ID=sa;Password=Jaypz100519"; } }
 
-        public string Connection { get { return @"Server=192.168.100.12,1005;Initial Catalog=db_POSDatabase;User ID=sa;Password=Jaypz100519"; } }
-        /// <summary>
-        /// returns DataTable. Result of Select All statement. Use this if selecting more than one row.
-        /// </summary>
-        public DataTable resultTable { get; set; }
-        /// <summary>
-        /// returns Array of string. Use this if selecting one row only
-        /// </summary>
-     //   public string[] resultString { get; set; }
+        private string _TableName;
+        public string TableName
+        {
+            get { return _TableName; }
+            set { _TableName = value; }
+        }
 
+        private string[,] _ColumnName;
+        public string[,] ColumnName
+        {
+            get { return _ColumnName; }
+            set { _ColumnName = value; }
+        }
+
+        private string[] _Values;
+        public string[] Values
+        {
+            get { return _Values; }
+            set { _Values = value; }
+        }
+
+        private string _Condition;
+        public string Condition
+        {
+            get { return _Condition; }
+            set { _Condition = value; }
+        }
+
+        private string _DbStatus;
+        public string DbStatus
+        {
+            get { return _DbStatus; }
+            set { _DbStatus = value; }
+        } 
 
         //*********** PROCEDURES
 
@@ -43,11 +67,9 @@ namespace TINPOS_Project.Class.DbFunction
                 sql_con.Open();
                 return true;
             }
-            catch
+            catch (Exception e)
             {
-                //ErrorMessage("dbConnect()", e.Message);
-                //sql_con.Close();
-                ////System.Environment.Exit(0);
+                _DbStatus = e.Message;
                 return false;
             }
         }
@@ -57,45 +79,45 @@ namespace TINPOS_Project.Class.DbFunction
                 sql_con.Close();
            
         }
-        public bool INSERT_INTO(String TableName, String[,] ColumnName , String[] Values)
+        public bool INSERT_INTO()
         {
             Boolean hasGuid = false;
             String szColumnNames = "";
             String szValues = "";
-            int szColCount = ColumnName.GetLength(0);
-            int szRowCount = Values.Count();
-            string szTableID = TableName.Substring(0, 4) + "ID";
+            int szColCount = _ColumnName.GetLength(0);
+            int szRowCount = _Values.Count();
+            string szTableID = _TableName.Substring(0, 4) + "ID";
 
             if ((szColCount - 2) != szRowCount) //Less 2 because ID and GUID has default values
             {
-                //errMsg = "Columns and Values does not match.";
+                _DbStatus = "Columns and Values does not match.";
                 goto ErrorMsg;
             }
 
             for (int ix = 0; ix < szColCount; ix++)
             {
-                if (ColumnName[ix, 0] == szTableID)
+                if (_ColumnName[ix, 0] == szTableID)
                     continue;
 
-                if (ColumnName[ix, 0].Contains("_GUID"))
+                if (_ColumnName[ix, 0].Contains("_GUID"))
                     hasGuid = true;
 
-                szColumnNames = szColumnNames + ColumnName[ix, 0];
+                szColumnNames = szColumnNames + _ColumnName[ix, 0];
                
 
-                if (ColumnName[ix,1].Contains('G')) //GUID
+                if (_ColumnName[ix,1].Contains('G')) //GUID
                     szValues = "@guidValue";
 
-                else if (ColumnName[ix, 1].Contains('9')) //Int
+                else if (_ColumnName[ix, 1].Contains('9')) //Int
                 {
-                    if (Values[ix - 2] != string.Empty)
-                        szValues = szValues + Values[ix - 2];
+                    if (_Values[ix - 2] != string.Empty)
+                        szValues = szValues + _Values[ix - 2];
                     else
                         szValues = szValues + 0;
                 }
 
-                else if (ColumnName[ix, 1].Contains('X')) //String
-                    szValues = szValues + "'" + Values[ix-2] + "'";
+                else if (_ColumnName[ix, 1].Contains('X')) //String
+                    szValues = szValues + "'" + _Values[ix-2] + "'";
 
                 if (ix != szColCount - 1)
                 {
@@ -111,7 +133,7 @@ namespace TINPOS_Project.Class.DbFunction
                 {
                     cmd.Transaction = trans;
                     cmd.CommandText = @"INSERT INTO " +
-                        TableName +
+                        _TableName +
                         "(" +
                         szColumnNames +
                         ") VALUES (" +
@@ -124,9 +146,9 @@ namespace TINPOS_Project.Class.DbFunction
                     {
                         cmd.ExecuteNonQuery();
                     }
-                    catch // (Exception e)
+                    catch  (Exception e)
                     {
-                        //errMsg = e.Message;
+                        _DbStatus = e.Message;
                         goto ErrorMsg;
                     }
 
@@ -137,17 +159,16 @@ namespace TINPOS_Project.Class.DbFunction
                 return true;
             }
         ErrorMsg:
-            //ErrorMessage("InsertInto() " + TableName + ": ", errMsg);
             return false;
         }
-        public bool Update_Table(string TableName, string[,] Columns, string[] Values, string Condition)
+        public bool Update_Table()
         {
             //check if both have same length.
-            int colCount = Columns.GetLength(0);
-            int valCount = Values.Count();
+            int colCount = _ColumnName.GetLength(0);
+            int valCount = _Values.Count();
             if (colCount != valCount)
             {
-                //errMsg = "Columns and Values do not match.";
+                _DbStatus = "Columns and Values do not match.";
                 goto Exit;
             }
 
@@ -155,19 +176,19 @@ namespace TINPOS_Project.Class.DbFunction
 
             for (int ix = 0; ix < colCount; ix++)
             {
-                if (Columns[ix, 1].Contains('9')) //Int
-                    q_set = q_set + Columns[ix, 0] + " = " + Values[ix];
+                if (_ColumnName[ix, 1].Contains('9')) //Int
+                    q_set = q_set + _ColumnName[ix, 0] + " = " + _Values[ix];
 
-                else if (Columns[ix, 1].Contains('X')) //String
-                    q_set = q_set + Columns[ix, 0] + " = '" + Values[ix] + "'";
+                else if (_ColumnName[ix, 1].Contains('X')) //String
+                    q_set = q_set + _ColumnName[ix, 0] + " = '" + _Values[ix] + "'";
 
                 if (ix < colCount - 1)
                     q_set = q_set + ", ";
             }
 
-            String query = "Update [" + TableName + "] " +
+            String query = "Update [" + _TableName + "] " +
                             "Set " + q_set +
-                            " Where " + Condition;
+                            " Where " + _Condition;
             try
             {
                 if (dbOpen())
@@ -183,20 +204,19 @@ namespace TINPOS_Project.Class.DbFunction
                 else
                     goto Exit;
             }
-            catch
+            catch (Exception e)
             {
-                //ErrorMessage("UpdateError: ", query + " " + e.Message);
+                _DbStatus = e.Message;
                 goto Exit;
             }
 
         Exit:
-            //ErrorMessage(TableName + ": ", errMsg);
             return false;
         }
-        public bool SelectAll(String TableName)
+        public DataTable SelectAll(String TableName)
         {
             String query = "Select * from [" + TableName + "]";
-            resultTable = new DataTable();
+          //  resultTable = new DataTable();
             try
             {
                 if (dbOpen())
@@ -206,34 +226,28 @@ namespace TINPOS_Project.Class.DbFunction
                         DataSet datatable = new DataSet();
                         reader.Fill(datatable);
                         dbClose();
-                        resultTable = datatable.Tables[0];
-                        if (resultTable.Rows.Count <= 0) //if no records found
-                            return false;
-
-                        return true;
+                        return datatable.Tables[0];
                     }
                 }
                 else
                     goto Exit;
             }
-            catch //(Exception e)
+            catch (Exception e)
             {
+                _DbStatus = e.Message;
                 goto Exit;
             }
             Exit:
-            //ErrorMessage("QueryError: ", query + " " + e.Message);
-            return false;
+            return null;
         }
-        public bool SelectAll_By(string TableName, string[,] columns, string[] values)
+        public DataTable SelectAll_By(string TableName, string[,] columns, string[] values)
         {
-            resultTable = new DataTable();
-            //check if both have same length.
             int colCount = columns.GetLength(0);
             int valCount = values.Count();
 
             if (colCount != valCount)
             {
-                //errMsg = "Columns and Values do not match.";
+                _DbStatus = "Columns and Values do not match.";
                 goto Exit;
             }
 
@@ -253,8 +267,6 @@ namespace TINPOS_Project.Class.DbFunction
 
             String query = "Select * from [" + TableName + "] " +
                             "Where " + q_condition;
-            //DataTable szData = dbSqlDataAdapter(query);
-            //return szData;
             try
             {
                 if (dbOpen())
@@ -267,21 +279,21 @@ namespace TINPOS_Project.Class.DbFunction
                         if (datatable.Tables[0].Rows.Count <= 0)
                             goto Exit;
 
-                        resultTable = datatable.Tables[0];
-                        return true;
+                        return datatable.Tables[0];
+                        //return true;
                     }
                 }
                 else
                     goto Exit;
             }
-            catch //(Exception e)
+            catch (Exception e)
             {
+                _DbStatus = e.Message;
                 goto Exit;
             }
 
         Exit:
-            //ErrorMessage(TableName + ": ", errMsg);
-            return false;
+            return null;
         }
 
 

@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TINPOS_Project.Class.DbFunction;
 using TINPOS_Project.Class.ProjectClass;
+using TINPOS_Project.Class._Interface;
+using TINPOS_Project.Class.DBTables.DbColumns;
 
 namespace TINPOS_Project.Class.DbFunction
 {
@@ -15,49 +17,96 @@ namespace TINPOS_Project.Class.DbFunction
     class DBQTable
     
     {
-        /// <summary>
-        /// TxTable Class
-        /// </summary>
-        public TXTable Table;
-        private DataTable _DataResult;
+        public IDBQStatement dbqStatement;
+        
+        public DBQTable()
+        {
+            this.dbqStatement = new DBQStatement();
+        }
 
         /// <summary>
         /// Type DataTable. Returns result of select query.
         /// </summary>
-        public virtual DataTable DataResult { get; set; }
+        private DataTable _DataResult;
+        public DataTable DataResult
+        {
+            get
+            {
+                return _DataResult;
+            } 
+            set 
+            {
+                _DataResult = new DataTable();
+                _DataResult.Clear();
+                _DataResult = value;
+            }
+        }
 
-        public String TableName     { get; set; }
+        private string _TableName;
+        public virtual string TableName     
+        {
+            get { return _TableName; }
+            set { _TableName = value; }
+        }
+
+        string[] _ColumnName;
+        public string[] ColumnName
+        {
+            get { return _ColumnName; }
+            set { _ColumnName = value; }
+        }
+
+        string[] _Values;
+        public string[] Values
+        {
+            get { return _Values; }
+            set { _Values = value; }
+        }
+
+        string _Condition;
+        public string Condition
+        {
+            get { return _Condition; }
+            set { _Condition = value; }
+        }
+
+        string _DbStatus;
+        public string DbStatus
+        {
+            get { return _DbStatus; }
+            set { _DbStatus = value; }
+        } 
+
         /// <summary>
         /// Type Multidimentional String[,]
         /// </summary>
-        public String[,] TXTable    { get; set; }
+        public String[,] _TXTable;
         /// <summary>
         /// All Data Types of columns
         /// </summary>
-        public String[] AllColumnTypes  { get; set; }
+      //  public String[] AllColumnTypes  { get; set; }
         /// <summary>
         /// All Column names. Returns an array of string[]
         /// </summary>
-        public String[] AllColumnNames  { get; set; }
-        public String TxName        { get; set; }
+       // public String[] AllColumnNames  { get; set; }
+        //string _TxName;
+        //public String TxName
+        //{
+        //    get { return _TxName;  }
+        //    set { _TxName = value;  }
+        //}
         /// <summary>
         /// Default columns
         /// </summary>
-        public int ID_C             { get; set; }
-        public int GUID_C           { get; set; }
+        //public int ID_C             { get; set; }
+        //public int GUID_C           { get; set; }
 
-
-
-        DBQStatement statement = new DBQStatement();
-        Shared shr = new Shared();
-
-
-        public void Initialization()
+        public void Initialization(string[,] table)
         {
-            Table = new TXTable(TxName);
-            AllColumnNames = Table.Column.AllNames;
-            AllColumnTypes = Table.Column.AllTypes;
-            TXTable = Table.TableArray;
+            //c_TXTable = new TXTable(_TxName);
+         //   AllColumnNames = txTable.Column.AllNames;
+         //   AllColumnTypes = txTable.Column.AllTypes;
+            _TXTable = table;
 
         }
         /// <summary>
@@ -67,69 +116,79 @@ namespace TINPOS_Project.Class.DbFunction
         /// <returns>Returns a multidimentional array string[,]</returns>
         public string[,] addColumnType(string[] columnName)
         {
+            zColumn.szTable = _TXTable;
+            zColumn.Initialize();
             int colCount = columnName.Count();
             string[,] columns = new string[colCount, 2];
             for (int ix = 0; ix < colCount; ix++)
             {
                 columns[ix, 0] = columnName[ix];
-                columns[ix, 1] = Table.Column.Typeof(columnName[ix]);
+                columns[ix, 1] = zColumn.Typeof(columnName[ix]);
             }
             return columns;
         }
         /// <summary>
-        /// Get all by column Index.
+        /// Get all by column Index. 
+        /// Set Value to properties ColumnName and Values before calling this function
         /// </summary>
         /// <param name="columnName">Column Name.</param>
         /// <param name="values">Value to search</param>
         /// <returns>Returns a DataTable</returns>
-        public bool Get_All_By(string[] columnName, string[] values)
+        public bool GetAll_By()
         {
             //check if both have same length.
             _DataResult = new DataTable();
             _DataResult.Clear();
-            int colCount = columnName.Count();
-            int idxCount = values.Count();
+            int colCount = _ColumnName.Count();
+            int idxCount = _Values.Count();
 
             if (colCount != idxCount)
             {
-                shr.errMsg = "Columns and Values do not match.";
+                _DbStatus = "Columns and Values do not match.";
                 goto Exit;
             }
 
-            string[,] columns = addColumnType(columnName);
-            bool found = statement.SelectAll_By(TableName, columns, values);
-            if (found)
+            string[,] columns = addColumnType(_ColumnName);
+            _DataResult = dbqStatement.SelectAll_By(_TableName, columns, _Values);
+            if (_DataResult != null) //found
             {
-                _DataResult = statement.resultTable;
-                InitializeDataTable();
                 return true;
             }
             else
-                return false ;
-
+                _DbStatus = dbqStatement.DbStatus;
         Exit:
-            shr.ErrorMessage(TableName + "get_All_By() ", shr.errMsg);
             return false;
         }
+        public virtual string[,] addDefaultColumns()
+        {
+            string[,] defaultColumns = {
+                                      {_TXTable[0,0],_TXTable[0,1]}, //TableID
+                                      {_TXTable[1,0],_TXTable[1,1]} //GUID
+                                    };
+            return defaultColumns;
+        }
+        public virtual string[] addDefaultValues()
+        {
+            return _Values;
+        }
+
         /// <summary>
         /// Add values into Table
+        /// Set Value to properties ColumnName and Values before calling this function
         /// </summary>
         /// <param name="columnName">Column name to add</param>
         /// <param name="Values">Values</param>
-        public virtual void AddValues(string[] columnName, String[] Values)
+        public virtual void Insert()
         {
-            int valCount = Values.GetLength(0);
+            int valCount = _Values.GetLength(0);
             if (valCount <= 0)
             {
-                shr.errMsg = "No Values to Add.";
+                _DbStatus = "No Values to Add.";
                 goto ErrorMsg;
             }
 
-            string[,] defaultColumns = {
-                                      {TXTable[ID_C,0],TXTable[ID_C,1]}, //TableID
-                                      {TXTable[GUID_C,0],TXTable[GUID_C,1]} //GUID
-                                    };
-            string[,] columnsToAdd = addColumnType(columnName);
+            string[,] defaultColumns = addDefaultColumns();
+            string[,] columnsToAdd = addColumnType(_ColumnName);
 
             int defColCount = defaultColumns.GetLength(0);
             int colCount = defColCount + columnsToAdd.GetLength(0);
@@ -145,41 +204,51 @@ namespace TINPOS_Project.Class.DbFunction
                 columns[i, 0] = columnsToAdd[i - defColCount, 0];
                 columns[i, 1] = columnsToAdd[i - defColCount, 1];
             }
-
-            if (statement.INSERT_INTO(TableName, columns, Values))
+            //Table dbTable = new Table();
+            String[] newValues = addDefaultValues();
+            dbqStatement.TableName = _TableName;
+            dbqStatement.ColumnName = columns;
+            dbqStatement.Values = newValues;
+            if (dbqStatement.INSERT_INTO())
                 return;
             else
-                shr.errMsg = "Error while Inserting into Database.";
+                _DbStatus = dbqStatement.DbStatus;
 
         ErrorMsg:
-            shr.ErrorMessage("A02_AddValues()", shr.errMsg);
+            return;
         }
         /// <summary>
         /// Update Values where TableID == ID 
+        /// Set Value to properties ColumnName and Values before calling this function
         /// </summary>
         /// <param name="columnName">Column to be updated</param>
         /// <param name="values">Values</param>
         /// <param name="ID">Condition: TableID = ID</param>
-        public void update_By_ID(string[] columnName, string[] values, int ID)
+        public void Update( string Condition)
         {
             //check if both have same length.
-            int colCount = columnName.Count();
-            int idxCount = values.Count();
+            int colCount = _ColumnName.Count();
+            int idxCount = _Values.Count();
 
             if (colCount != idxCount)
             {
-                shr.errMsg = "Columns and Values do not match.";
+                _DbStatus = "Columns and Values do not match.";
                 goto Exit;
             }
-            string[,] columns = addColumnType(columnName);
-            bool update = statement.Update_Table(TableName, columns, values, AllColumnNames[ID_C] + " = " + ID);
+            string[,] columns = addColumnType(_ColumnName);
+           // Table dbTable = new Table();
+            dbqStatement.TableName = _TableName;
+            dbqStatement.ColumnName = columns;
+            dbqStatement.Values = _Values;
+            dbqStatement.Condition = Condition;
+            bool update = dbqStatement.Update_Table();
             if (update)
                 return;
             else
-                shr.errMsg = "Error while Updating records in database.";
-                
+                _DbStatus = dbqStatement.DbStatus;
+
         Exit:
-            shr.ErrorMessage(TableName + "update_By_ID() ", shr.errMsg);
+            return;
         }
         /// <summary>
         /// Get All records.
@@ -189,14 +258,16 @@ namespace TINPOS_Project.Class.DbFunction
         {
             _DataResult = new DataTable();
             _DataResult.Clear();
-            if (statement.SelectAll(TableName))
+            _DataResult = dbqStatement.SelectAll(_TableName);
+            if (_DataResult != null) //found
             {
-                _DataResult = statement.resultTable;
-                InitializeDataTable();
+                //  _DataResult = statement.resultTable;
+               // InitializeDataTable();
                 return true;
             }
             else
-                return false;
+                _DbStatus = dbqStatement.DbStatus;
+            return false;
         }
         /// <summary>
         /// Default 0 if DataResult has one row.
@@ -208,14 +279,5 @@ namespace TINPOS_Project.Class.DbFunction
         {
             return DataResult.Rows[row][ColumnName].ToString();
         }
-        public void InitializeDataTable()
-        {
-            DataResult = new DataTable();
-            DataResult.Clear();
-            DataResult = _DataResult;
-        }
-      
-        
-
     }
 }
