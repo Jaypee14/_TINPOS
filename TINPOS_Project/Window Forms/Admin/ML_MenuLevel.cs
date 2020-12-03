@@ -10,14 +10,15 @@ using System.Windows.Forms;
 using TINPOS_Project.Class;
 using TINPOS_Project.Class.DbFunction;
 using TINPOS_Project.Class.ProjectClass;
+using TINPOS_Project.Class.DBTables.DbColumns;
 
 namespace TINPOS_Project.Window_Forms.Admin
 {
     public partial class ML_MenuLevel : Form
     {
-        S01 s01 = new S01();
-        S02 s02 = new S02();
-        T01 t01 = new T01();
+        S01 S01 = new S01();
+        S02 S02 = new S02();
+        T01 T01 = new T01();
         Shared shr = new Shared();
 
         public bool Saved = false;
@@ -26,9 +27,6 @@ namespace TINPOS_Project.Window_Forms.Admin
         public ML_MenuLevel()
         {
             InitializeComponent();
-            //s01.Initialization();
-            //s02.Initialization();
-            //t01.Initialization();
 
         }
 
@@ -36,9 +34,9 @@ namespace TINPOS_Project.Window_Forms.Admin
         {
 
             //check first if Menu Level do not exist.
-            string[] s02Col = {s02.Group_Name};
-            string[] s02Val = {txb_Name.Text};
-            bool s02Found = s02.Get_All_By(s02Col, s02Val);
+            S02.ColumnName = new string[] {s02.Group_Name};
+            S02.Values     = new string[] {txb_Name.Text};
+            bool s02Found = S02.GetAll_By();
             if (s02Found) //Menu Level exist
             {
                 shr.errMsg = "Existing Menu Level.";
@@ -48,36 +46,32 @@ namespace TINPOS_Project.Window_Forms.Admin
             //Get all S01
             //Insert all S01 to T01.
 
-            /*
-             (TXS02),_4
-                S02_ID,9
-                S02_GUID,G
-                S02_GROUP_NAME,X
-                S02_DESCRIPTION,X;
-             */
-            string[] s02_Col = {   s02.Group_Name,
+            S02.ColumnName = new string[]
+                            {   s02.Group_Name,
                                 s02.Description
                             };
-            string[] s02_Val = {txb_Name.Text,
+            S02.Values = new string[]
+                            {   txb_Name.Text,
                                 txb_Description.Text
-                               };
-            s02.AddValues(s02_Col,s02_Val); // Add to s02.
+                            };
+            S02.Insert(); // Add to s02.
 
-            s02Found = s02.Get_All_By(s02Col, s02Val);
-            int szS02_ID = Convert.ToInt32(s02.ValueOf(s02.ID)); //get the S02 ID
+            s02Found = S02.GetAll_By();
+            int szS02_ID = Convert.ToInt32(S02.ValueOf(s02.ID)); //get the S02 ID
 
 
-            if (!s01.GetAll()) //no S01 found
+            if (!S01.GetAll()) //no S01 found
             {
                 shr.errMsg = "No Transactions found";
                 goto Exit;
             }
-            DataTable s01Data = s01.DataResult;
-            string[] t01_Col = { t01.S02_ID,
+            DataTable s01Data = S01.DataResult;
+            T01.ColumnName = new string[]
+                            { t01.S02_ID,
                               t01.S01_ID,
                               t01.ACCESS
                             };
-            string[] t01_Val = new string[t01_Col.GetLength(0)];
+            string[] t01_Val = new string[T01.ColumnName.GetLength(0)];
 
             var result = from myresult in s01Data.AsEnumerable()
                          select myresult;
@@ -87,7 +81,8 @@ namespace TINPOS_Project.Window_Forms.Admin
                 t01_Val[0] = szS02_ID.ToString();
                 t01_Val[1] = szS01_ID.ToString();
                 t01_Val[2] = "0";
-                t01.AddValues(t01_Col, t01_Val);             
+                T01.Values = t01_Val;
+                T01.Insert();             
             }
 
             Saved = true;

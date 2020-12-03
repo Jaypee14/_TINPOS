@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using TINPOS_Project.Class;
 using TINPOS_Project.Class.DbFunction;
 using TINPOS_Project.Class.ProjectClass;
-
+using TINPOS_Project.Class.DBTables.DbColumns;
 
 namespace TINPOS_Project.Window_Forms.Admin
 {
@@ -19,12 +19,12 @@ namespace TINPOS_Project.Window_Forms.Admin
     {
         #region Declarations
         //Classes
-        A02 a02 = new A02();
-        S00 s00 = new S00();
-        S01 s01 = new S01();
-        S02 s02 = new S02();
-        S03 s03 = new S03();
-        T01 t01 = new T01();
+        A02 A02 = new A02();
+        S00 S00 = new S00();
+        S01 S01 = new S01();
+        S02 S02 = new S02();
+        S03 S03 = new S03();
+        T01 T01 = new T01();
         Tinposparm param = new Tinposparm();
         Shared shr = new Shared();
 
@@ -119,25 +119,25 @@ namespace TINPOS_Project.Window_Forms.Admin
             cmb_ID.Text = szUsrID;
 
             //search if userID Exists in A02.
-            if(!a02.get_By_UserID(szUsrID)) //not found
+            if(!A02.get_By_UserID(szUsrID)) //not found
             {
-                shr.errMsg = "User ID not Found";
+                shr.errMsg = A02.DbStatus;
                 goto Exit;
             }
-            szA02_ID = Convert.ToInt32(a02.ValueOf(a02.ID));
+            szA02_ID = Convert.ToInt32(A02.ValueOf(a02.ID));
 
             //search if menu level exists in S02.
-            if (!s02.GetAll()) //no S02 found
+            if (!S02.GetAll()) //no S02 found
             {
-                shr.errMsg = "No Menu Level found";
+                shr.errMsg = S02.DbStatus;
                 goto Exit;
             }
             bool szFound = false;
-            for (int ix = 0; ix < s02.DataResult.Rows.Count; ix++)
+            for (int ix = 0; ix < S02.DataResult.Rows.Count; ix++)
             {
-                if (s02.ValueOf(s02.Group_Name, ix) == szMenuLevel)
+                if (S02.ValueOf(s02.Group_Name, ix) == szMenuLevel)
                 {
-                    szS02_ID = Convert.ToInt32(s02.ValueOf(s02.ID, ix));
+                    szS02_ID = Convert.ToInt32(S02.ValueOf(s02.ID, ix));
                     szFound = true;
                 }
             }
@@ -148,29 +148,31 @@ namespace TINPOS_Project.Window_Forms.Admin
             }
 
             //search if userID exist in S03.
-            string[] column = { s03.A02_ID
-                           };
-            string[] values = { szA02_ID.ToString()
-                              };
-            bool s03Found = s03.Get_All_By(column, values);
+            S03.ColumnName = new string[] { s03.A02_ID };
+            S03.Values = new string[]     { szA02_ID.ToString()};
+            bool s03Found = S03.GetAll_By();
             if (!s03Found)
             {
                 //Insert values to S03
-                string[] s03Columns = { s03.A02_ID,
+                S03.ColumnName = new string[] 
+                                   {    s03.A02_ID,
                                         s03.S02_ID,
                                    };
-                string[] s03Values ={szA02_ID.ToString(),
-                                     szS02_ID.ToString(),
-                                     /*""/*S03_S01_ID = null,*/
-                                     /*""S03_ACCESS = null*/};
-                s03.AddValues(s03Columns, s03Values);
+                S03.Values = new string[]
+                                    {   szA02_ID.ToString(),
+                                        szS02_ID.ToString(),
+                                         /*""/*S03_S01_ID = null,*/
+                                         /*""S03_ACCESS = null*/
+                                    };
+                S03.Insert();
                 goto FinalStep;
             }
             //Update Menu Level in S03
-            int szS03_ID = Convert.ToInt32(s03.ValueOf(s03.ID));
-            string[] s03Col = { s03.S02_ID };
-            string[] s03Val = { szS02_ID.ToString()};
-            s03.update_By_ID(s03Col, s03Val, szS03_ID);
+            //int szS03_ID = Convert.ToInt32(s03.ValueOf(s03.ID));
+            S03.ColumnName = new string[] { s03.S02_ID };
+            S03.Values     = new string[] { szS02_ID.ToString() };
+            string s03Condition = s03.ID + " = " + S03.ValueOf(s03.ID);
+            S03.Update(s03Condition);
 
         FinalStep:
             btn_Enquire_Click(sender, e);
@@ -198,37 +200,41 @@ namespace TINPOS_Project.Window_Forms.Admin
                 if (szMenuLevel)
                 {
                     //Update T01
-                    int szT01_ID = Convert.ToInt32(values[0]);
+                   // int szT01_ID = Convert.ToInt32(values[0]);
                     string szT01_Access = values[1].ToString();
-                    string[] t01Col = { t01.ACCESS };
-                    string[] t01Val = { szT01_Access };
-                    t01.update_By_ID(t01Col, t01Val, szT01_ID);
+                    T01.ColumnName = new string[] { t01.ACCESS };
+                    T01.Values     = new string[] { szT01_Access };
+                    string t01Condition = t01.ID + " = " + values[0];
+                    T01.Update(t01Condition);
                     goto Next;
                 }
 
                 if (colAction.Substring(0, 1) == "_")
                 {
                     //update S03
-                    int szS03_ID = Convert.ToInt32(values[0]);
+                    //int szS03_ID = Convert.ToInt32(values[0]);
                     string szS03_Access = values[1];
-                    string[] s03Col = { s03.ACCESS };
-                    string[] s03Val = { szS03_Access };
-                    s03.update_By_ID(s03Col, s03Val, szS03_ID);
+                    S03.ColumnName = new string[] { s03.ACCESS };
+                    S03.Values     = new string[] { szS03_Access };
+                    string s03Condition = s03.ID + " = " + values[0];
+                    S03.Update(s03Condition);
                 }
                 else
                 {
                     //insert S03
-                    string[] s03Col = { s03.A02_ID,
+                    S03.ColumnName = new string[] 
+                                   { s03.A02_ID,
                                    /*  s03.S02_ID_C,*/
                                      s03.S01_ID,
                                      s03.ACCESS
                                    };
-                    string[] s03Val = { values[0], /*S03_A02_ID*/
+                    S03.Values = new string[] 
+                                      { values[0], /*S03_A02_ID*/
                                        /* values[1], /*S03_S02_ID = blank*/  
                                         values[2], /*S03_S01_ID*/  
                                         values[3], /*S03_ACCESS*/
                                       };
-                    s03.AddValues(s03Col, s03Val);
+                    S03.Insert();
                 }
             Next:
                 if (ix == dgvCount - 1)
@@ -321,8 +327,8 @@ namespace TINPOS_Project.Window_Forms.Admin
                 return;
 
             //Search For Menu Level in S02
-            s02.GetAll(); 
-            DataTable szS02Data = s02.DataResult;
+            S02.GetAll(); 
+            DataTable szS02Data = S02.DataResult;
             var szResult = from myResult in szS02Data.AsEnumerable()
                            where myResult.Field<string>(s02.Group_Name) == szUsrID_Menu
                            select myResult;
@@ -336,7 +342,7 @@ namespace TINPOS_Project.Window_Forms.Admin
                 goto Display_DGV;
 
             //Search for userID in A02
-            bool a02Found = a02.get_By_UserID(szUsrID_Menu);
+            bool a02Found = A02.get_By_UserID(szUsrID_Menu);
             if (!a02Found)
             {
                 shr.errMsg = "User ID/Menu Level not Found";
@@ -344,14 +350,14 @@ namespace TINPOS_Project.Window_Forms.Admin
             }
 
             //Search for S03
-            szA02_ID       = Convert.ToInt32(a02.ValueOf(a02.ID));
-            cmb_Child.Text = a02.ValueOf(a02.UserID);
-            txt_Name.Text  = shr.toTitleCase(a02.ValueOf(a02.FirstName) + " " +
-                                             a02.ValueOf(a02.LastName));
+            szA02_ID       = Convert.ToInt32(A02.ValueOf(a02.ID));
+            cmb_Child.Text = A02.ValueOf(a02.UserID);
+            txt_Name.Text  = shr.toTitleCase(A02.ValueOf(a02.FirstName) + " " +
+                                             A02.ValueOf(a02.LastName));
 
-            string[] col = {s03.A02_ID};
-            string[] val = { szA02_ID.ToString() };
-            bool s03Found = s03.Get_All_By(col, val);
+            S03.ColumnName = new string[] { s03.A02_ID };
+            S03.Values     = new string[] { szA02_ID.ToString() };
+            bool s03Found = S03.GetAll_By();
             if (!s03Found)
             {
                 shr.errMsg = "No Menu Level linked to userID " + szUsrID_Menu.ToUpper();
@@ -362,23 +368,23 @@ namespace TINPOS_Project.Window_Forms.Admin
             Extra_Access.Columns.Add(s03.ACCESS);
             Extra_Access.Columns.Add(s03.ID);
 
-            int szS03_Count = s03.DataResult.Rows.Count;
+            int szS03_Count = S03.DataResult.Rows.Count;
             for (int ix = 0; ix < szS03_Count; ix++)
             {
                 //If S03_S02_ID is empty, get the S01 record and add value to sz_Extra_Access
                 //else go to Display_DGV to display the Parent's Access
                 if (szS02_ID == 0)
                 {
-                    int szS03_S02_ID = Int32.Parse(s03.ValueOf(s03.S02_ID, ix));
+                    int szS03_S02_ID = Int32.Parse(S03.ValueOf(s03.S02_ID, ix));
                     if (szS03_S02_ID != 0)
                     {
                         szS02_ID = szS03_S02_ID;
                         continue;
                     }
                 }
-                int szS03_S01_ID = Int32.Parse(s03.ValueOf(s03.S01_ID, ix));
-                int szS03_ACCESS = Int32.Parse(s03.ValueOf(s03.ACCESS, ix));
-                int szS03_ID = Int32.Parse(s03.ValueOf(s03.ID, ix));
+                int szS03_S01_ID = Int32.Parse(S03.ValueOf(s03.S01_ID, ix));
+                int szS03_ACCESS = Int32.Parse(S03.ValueOf(s03.ACCESS, ix));
+                int szS03_ID = Int32.Parse(S03.ValueOf(s03.ID, ix));
                 if (szS03_S01_ID != 0)
                 {
                     Extra_Access.Rows.Add(szS03_S01_ID, szS03_ACCESS, szS03_ID);
@@ -386,17 +392,17 @@ namespace TINPOS_Project.Window_Forms.Admin
             }
 
             //Get S02
-            string[] s02Col = {s02.ID};
-            string[] s02Val = {szS02_ID.ToString()};
-            bool s02Found = s02.Get_All_By(s02Col, s02Val);
-            cmb_Parent.Text = s02.ValueOf(s02.Group_Name);
+            S02.ColumnName = new string[] {s02.ID};
+            S02.Values     = new string[] {szS02_ID.ToString()};
+            bool s02Found = S02.GetAll_By();
+            cmb_Parent.Text = S02.ValueOf(s02.Group_Name);
             
 
         Display_DGV: //Search for T01
-            string[] t01Col = {t01.S02_ID};
-            string[] t01Val = {szS02_ID.ToString() };
-            bool t01Found = t01.Get_All_By(t01Col, t01Val);
-            int szRowCount = t01.DataResult.Rows.Count;
+            T01.ColumnName = new string[] {t01.S02_ID};
+            T01.Values     = new string[] {szS02_ID.ToString() };
+            bool t01Found = T01.GetAll_By();
+            int szRowCount = T01.DataResult.Rows.Count;
             int szDataNo = 0;
             int szScreenRowIndex = 0;
             int szScreenCount = 0;
@@ -407,9 +413,9 @@ namespace TINPOS_Project.Window_Forms.Admin
             for (int ix = 0; ix < szRowCount; ix++)
             {
 
-                int szT01_S01_ID = Int32.Parse(t01.ValueOf(t01.S01_ID, ix));
-                int szT01_Access = Int32.Parse(t01.ValueOf(t01.ACCESS, ix));
-                int szT01_ID = Int32.Parse(t01.ValueOf(t01.ID, ix));
+                int szT01_S01_ID = Int32.Parse(T01.ValueOf(t01.S01_ID, ix));
+                int szT01_Access = Int32.Parse(T01.ValueOf(t01.ACCESS, ix));
+                int szT01_ID = Int32.Parse(T01.ValueOf(t01.ID, ix));
                 int szS03_ID = 0;
 
                 sz_Extra_Access = szT01_Access;
@@ -432,18 +438,18 @@ namespace TINPOS_Project.Window_Forms.Admin
                     szDgv_ID = "S03_" + szS03_ID;
 
                 //Get S01
-                string[] s01Col = { s01.ID };
-                string[] s01Val = { szT01_S01_ID.ToString() };
-                s01.Get_All_By(s01Col, s01Val);
-                int szS00_ID = Convert.ToInt32(s01.ValueOf(s01.S00_ID));
+                S01.ColumnName = new string[] { s01.ID };
+                S01.Values     = new string[] { szT01_S01_ID.ToString() };
+                S01.GetAll_By();
+                int szS00_ID = Convert.ToInt32(S01.ValueOf(s01.S00_ID));
                 //Get ScreenName
-                string[] s00Col = { s00.ID };
-                string[] s00Val = { szS00_ID.ToString() };
-                s00.Get_All_By(s00Col, s00Val);
-                string szScreen = s00.ValueOf(s00.Screen);
-                string szScreenDesc = s00.ValueOf(s00.Description);
-                string szTransactionName = s01.ValueOf(s01.Transaction);
-                int szS01_ID = Convert.ToInt32(s01.ValueOf(s01.ID));
+                S00.ColumnName = new string[] { s00.ID };
+                S00.Values     = new string[] { szS00_ID.ToString() };
+                S00.GetAll_By();
+                string szScreen = S00.ValueOf(s00.Screen);
+                string szScreenDesc = S00.ValueOf(s00.Description);
+                string szTransactionName = S01.ValueOf(s01.Transaction);
+                int szS01_ID = Convert.ToInt32(S01.ValueOf(s01.ID));
 
 
                 //insert into dgv_Main
@@ -592,10 +598,10 @@ namespace TINPOS_Project.Window_Forms.Admin
             if (szTable == "S00_")
             {               
                 int ix = 0;
-                string[] s01Col = { s01.S00_ID };
-                string[] s01Val = { szID.ToString() };
-                bool s01Found = s01.Get_All_By(s01Col, s01Val);
-                DataTable szS01Data = s01.DataResult;
+                S01.ColumnName = new string[] { s01.S00_ID };
+                S01.Values     = new string[] { szID.ToString() };
+                bool s01Found = S01.GetAll_By();
+                DataTable szS01Data = S01.DataResult;
                 var result = from myResult in szS01Data.AsEnumerable()
                              select myResult;
                 foreach (var data in result)
@@ -616,10 +622,10 @@ namespace TINPOS_Project.Window_Forms.Admin
                     int szS01_ID = data.Field<int>(s01.ID);
                     int szS03_ID = 0;
                     bool hasS03S01 = false;
-                    string[] s03col = { s03.A02_ID };
-                    string[] s03val = { szA02_ID.ToString() };
-                    bool s03Found = s03.Get_All_By(s03col, s03val);
-                    DataTable szS03Data = s03.DataResult;
+                    S03.ColumnName = new string[] { s03.A02_ID };
+                    S03.Values     = new string[] { szA02_ID.ToString() };
+                    bool s03Found = S03.GetAll_By();
+                    DataTable szS03Data = S03.DataResult;
                     var s03result = from mys03result in szS03Data.AsEnumerable()
                                     select mys03result;
                     foreach (var s03data in s03result)
@@ -657,10 +663,10 @@ namespace TINPOS_Project.Window_Forms.Admin
                 //from s00, get S01
                 //from s01, get T01 where S02_ID == szS02_ID
                 int ix = 0;
-                string[] s01Col = { s01.S00_ID };
-                string[] s01Val = { szID.ToString() };
-                bool s01Found = s01.Get_All_By(s01Col, s01Val);
-                DataTable szS01Data = s01.DataResult;
+                S01.ColumnName = new string[] { s01.S00_ID };
+                S01.Values     = new string[] { szID.ToString() };
+                bool s01Found = S01.GetAll_By();
+                DataTable szS01Data = S01.DataResult;
                 var result = from myResult in szS01Data.AsEnumerable()
                               select myResult;
                 foreach (var data in result)
@@ -678,10 +684,10 @@ namespace TINPOS_Project.Window_Forms.Admin
 
                     }
                     int szS01_ID = data.Field<int>(s01.ID);
-                    string[] t01Col = {t01.S01_ID};
-                    string[] t01Val = {szS01_ID.ToString()};
-                    t01.Get_All_By(t01Col, t01Val);
-                    DataTable szT01Data = t01.DataResult;
+                    T01.ColumnName = new string[] {t01.S01_ID};
+                    T01.Values     = new string[] {szS01_ID.ToString()};
+                    T01.GetAll_By();
+                    DataTable szT01Data = T01.DataResult;
                     int szT01_ID = get_ID_from_T01(szT01Data);
                     if (szT01_ID == 0)
                     {
@@ -752,11 +758,11 @@ namespace TINPOS_Project.Window_Forms.Admin
 
         private string Insert_Values(int ID, int Access)
         {
-            string[] s01Col = { s01.ID };
-            string[] s01Val = { ID.ToString() };
-            s01.Get_All_By(s01Col, s01Val);
+            S01.ColumnName = new string[] { s01.ID };
+            S01.Values = new string[] { ID.ToString() };
+            S01.GetAll_By();
             int szVal_A02_ID = szA02_ID;
-            int szVal_S01_ID = Convert.ToInt32(s01.ValueOf(s01.ID));
+            int szVal_S01_ID = Convert.ToInt32(S01.ValueOf(s01.ID));
 
             string col_Values = szVal_A02_ID + "," +
                 /*S03_S02_ID = null */ "," +

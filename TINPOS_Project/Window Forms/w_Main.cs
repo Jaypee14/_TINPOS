@@ -12,16 +12,19 @@ using TINPOS_Project.Window_Forms;
 using TINPOS_Project.Window_Forms.Admin;
 using TINPOS_Project.Class.DbFunction;
 using TINPOS_Project.Class.ProjectClass;
+using TINPOS_Project.Class.DBTables.DbColumns;
 
 namespace TINPOS_Project
 {
     public partial class w_Main : Form
     {
         //INITIALIZE CLASSES
-      
-        Shared shr = new Shared();
+        zInitialize_Columns init = new zInitialize_Columns();
         Tinposparm tp = new Tinposparm();
-        DBQTable a02 = new A02();
+
+        //Shared shr = new Shared();
+        //Tinposparm tp = new Tinposparm();
+        //DBQTable a02 = new A02();
         //S02 s02 = new S02();
 
         //INITIALIZE FORMS
@@ -32,6 +35,7 @@ namespace TINPOS_Project
         public w_Main()
         {
             InitializeComponent();
+
             //tp.Initialization();
 
             //SET PARENT FORM
@@ -41,11 +45,13 @@ namespace TINPOS_Project
 
             tp.User_Transaction_Access("ML", "Menu Level", "delete_S02_MenuLevel", 1);
             tp.User_Transaction_Access("ML", "Menu Level", "update_S02_MenuLevel", 1);
+            //tp.User_Transaction_Access("ML", "Menu Level", "enquire_S02_MenuLevel", 1);
+            tp.User_Transaction_Access("ML", "Menu Level", "print_S02_MenuLevel", 1);
 
             //A02 a02 = new A02();
             //MessageBox.Show(a02.Table.Column.Typeof(a02.FirstName));
-            
 
+         //   MessageBox.Show(a02.LastName);
             
 
         }

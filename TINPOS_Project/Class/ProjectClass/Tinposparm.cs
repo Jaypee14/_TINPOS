@@ -7,17 +7,18 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TINPOS_Project.Class.DbFunction;
 using TINPOS_Project.Class.ProjectClass;
+using TINPOS_Project.Class.DBTables.DbColumns;
 
 namespace TINPOS_Project.Class.ProjectClass
 {
     //Parent
     class Tinposparm
     {
-        S00 s00 = new S00();
-        S01 s01 = new S01();
-        S02 s02 = new S02();
-        S03 s03 = new S03();
-        T01 t01 = new T01();
+        S00 S00 = new S00();
+        S01 S01 = new S01();
+        S02 S02 = new S02();
+        S03 S03 = new S03();
+        T01 T01 = new T01();
         Shared shr = new Shared();
 
 
@@ -35,11 +36,7 @@ namespace TINPOS_Project.Class.ProjectClass
 
         public void Initialization()
         {
-            //s00.Initialization();
-            //s01.Initialization();
-            //s02.Initialization();
-            //s03.Initialization();
-            //t01.Initialization();
+ 
 
             //add_A01_Customer        =               User_Transaction_Access("CR", "CustomerRecord", "add_A01_Customer", 1);
             //enquire_A01_Customer    =               User_Transaction_Access("CR", "CustomerRecord", "enquire_A01_Customer", 1);
@@ -64,16 +61,18 @@ namespace TINPOS_Project.Class.ProjectClass
             }
 
             int s00_ID = 0;
-            string[] s00Col = { s00.Screen,
+            S00.ColumnName = new string[]
+                           { s00.Screen,
                              s00.Description };
-            string[] s00Val = { ScreenName,
-                                Description };
-            bool s00Found = s00.Get_All_By(s00Col, s00Val);
+            S00.Values = new string []
+                           { ScreenName,
+                             Description };
+            bool s00Found = S00.GetAll_By();
             if (s00Found)
-                s00_ID = Convert.ToInt32(s00.ValueOf(s00.ID));
+                s00_ID = Convert.ToInt32(S00.ValueOf(s00.ID));
             else
             {
-                s00.AddValues(s00Col, s00Val);
+                S00.Insert();
                 s00_ID = Screen(ScreenName, Description, 1);
             }
             if(s00_ID != 0)
@@ -94,43 +93,47 @@ namespace TINPOS_Project.Class.ProjectClass
             }
           
             int s01_ID = 0;
-            string[] s01Col = { s01.Transaction,
+            S01.ColumnName = new string []
+                           { s01.Transaction,
                              s01.S00_ID };
-            string[] s01Val = { transactionName,
-                                screenID.ToString() };
-            bool s01Found = s01.Get_All_By(s01Col, s01Val);
+            S01.Values = new string []
+                           { transactionName,
+                             screenID.ToString() };
+            bool s01Found = S01.GetAll_By();
             if (s01Found)
-                s01_ID = Convert.ToInt32(s01.ValueOf(s01.ID));
+                s01_ID = Convert.ToInt32(S01.ValueOf(s01.ID));
             else
             {
-                s01.AddValues(s01Col, s01Val);
+                S01.Insert();
                 s01_ID = Transaction(transactionName, screenID, 1);
             }
 
             if (stage == 1)
             {
                 //Add transaction to All Menu Levels.
-                if (!s02.GetAll()) //no S02 found
+                if (!S02.GetAll()) //no S02 found
                 {
-                    shr.errMsg = "No Menu Level found";
+                    shr.errMsg = S02.DbStatus;
                     goto Exit;
                 } 
-                DataTable s02Data = s02.DataResult;
+                DataTable s02Data = S02.DataResult;
                 if (s02Data.Rows.Count > 0)
                 {
                     int szS02Count = s02Data.Rows.Count;
                     for(int ix = 0; ix < szS02Count; ix++){
                         DataRow row = s02Data.Rows[ix];
                         int szS02_ID = Convert.ToInt32(row[s02.ID]);
-                        string[] t01col = { t01.S02_ID,
+                        T01.ColumnName = new string[]
+                                       { t01.S02_ID,
                                          t01.S01_ID,
                                          t01.ACCESS
                                        };
-                        string[] t01val = { szS02_ID.ToString(),
+                        T01.Values = new string []
+                                       { szS02_ID.ToString(),
                                             s01_ID.ToString(),
                                             "0"
-                                          };
-                        t01.AddValues(t01col, t01val);
+                                       };
+                        T01.Insert();
                     }
                 }
             }
@@ -147,10 +150,10 @@ namespace TINPOS_Project.Class.ProjectClass
         public bool User_Transaction_Access(string screen, string description, string transaction, int userID)
         {
             //Get the Menu Level for this userID.
-            int MenuID = s03.get_MenuLevel(userID);
+            int MenuID = S03.get_MenuLevel(userID);
             if (MenuID == 0)
             {
-                shr.errMsg = "No Menu Level Linked.";
+                shr.errMsg = "No Menu Level Linked. -" + Environment.NewLine + S03.DbStatus;
                 goto Exit;
             }
 
@@ -162,14 +165,16 @@ namespace TINPOS_Project.Class.ProjectClass
 
             //Check if user's Menu Level has access to this screen.
             bool MenuAccess = false;
-            string[] t01col = {t01.S02_ID,
+            T01.ColumnName = new string[]
+                              {t01.S02_ID,
                                t01.S01_ID};
-            string[] t01val = {MenuID.ToString(),
+            T01.Values = new string []
+                              {MenuID.ToString(),
                               TransactionID.ToString()};
-            bool t01Found = t01.Get_All_By(t01col, t01val);
+            bool t01Found = T01.GetAll_By();
             if (t01Found)
             {
-                if (Convert.ToInt32(t01.ValueOf(t01.ACCESS)) == 1)
+                if (Convert.ToInt32(T01.ValueOf(t01.ACCESS)) == 1)
                     MenuAccess = true;
             }
             
@@ -177,15 +182,17 @@ namespace TINPOS_Project.Class.ProjectClass
             //If user has no Extra Access, use the Menu Level
             bool UserAccess = false;
             bool hasExtraAccess = false;
-            string[] s03col = {s03.A02_ID,
+            S03.ColumnName = new string[]
+                              {s03.A02_ID,
                                s03.S01_ID};
-            string[] s03val = {userID.ToString(),
-                              TransactionID.ToString()};
-            bool s03Found = s03.Get_All_By(s03col, s03val);
+            S03.Values = new string []
+                              {userID.ToString(),
+                               TransactionID.ToString()};
+            bool s03Found = S03.GetAll_By();
             if (s03Found)
             {
                 hasExtraAccess = true;
-                if (Convert.ToInt32(s03.ValueOf(s03.ACCESS)) == 1)
+                if (Convert.ToInt32(S03.ValueOf(s03.ACCESS)) == 1)
                     UserAccess = true;
             }
 
